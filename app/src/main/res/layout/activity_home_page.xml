@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primaryBgBlack"
+    tools:context=".controller.HomePage">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarMenu"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tvAppTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:textColor="@color/red"
+                android:textSize="21sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/guideLeftMargin"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                app:cardCornerRadius="@dimen/dimens_40"
+                app:layout_constraintEnd_toStartOf="@+id/guideRightMargin"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                >
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/profilIconBgColor"
+                    >
+
+                    <ImageView
+                        android:id="@+id/ivProfileAvatar"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintStart_toStartOf="@+id/guide3"
+                        app:layout_constraintEnd_toEndOf="@+id/guide4"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:src="@drawable/profile_pic_na"
+                        android:scaleType="centerCrop"
+                        app:layout_constraintVertical_bias=".9"
+                        android:contentDescription="@string/profile_icon" />
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guide1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        app:layout_constraintGuide_percent=".1"
+                        />
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guide2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        app:layout_constraintGuide_percent=".98"
+                        />
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guide3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent=".1"
+                        />
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guide4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent=".9"
+                        />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideLeftMargin"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent=".04"/>
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideRightMargin"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent=".96"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <TextView
+        android:id="@+id/tvUsernameBigTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="EDGE'S PLAYLIST"
+        android:textColor="@color/white"
+        android:textSize="28dp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appBarMenu"
+        android:layout_margin="@dimen/playlist_text_margin"/>
+
+    <GridView
+        android:id="@+id/gvAllPlaylist"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvUsernameBigTitle"
+        app:layout_constraintBottom_toTopOf="@+id/glBottomGrid"
+        android:layout_margin="@dimen/dimens_8"
+        android:numColumns="2"
+        android:horizontalSpacing="@dimen/dimens_5"
+        android:verticalSpacing="@dimen/dimens_5"/>
+
+    <TextView
+        android:id="@+id/tvPagination"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/gvAllPlaylist"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
+        android:text="0/0"
+        android:textColor="@color/secondaryTextColor"/>
+
+    <ImageButton
+        android:id="@+id/backBtn"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:src="@drawable/left_arrow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/tvPagination"
+        app:layout_constraintTop_toBottomOf="@+id/gvAllPlaylist"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"/>
+
+    <ImageButton
+        android:id="@+id/fowardBtn"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:src="@drawable/right_arrow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvPagination"
+        app:layout_constraintTop_toBottomOf="@+id/gvAllPlaylist"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"/>
+
+
+
+<!--    <com.google.android.youtube.player.YouTubePlayerView-->
+<!--        android:id="@+id/youtubePlayerScreen"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/tvUsernameBigTitle"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"-->
+<!--        android:layout_margin="@dimen/dimens_8"-->
+<!--        />-->
+
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="@color/red"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:menu="@menu/home_page_menu"
+        android:foregroundGravity="center"
+        android:layout_alignParentBottom="true"
+        android:visibility="visible"
+        app:labelVisibilityMode="labeled"
+        />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/glBottomGrid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".87"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

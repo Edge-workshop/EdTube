@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">EdTube</string>
+
+    <!--H-->
+    <string name="home">Home</string>
+
+    <!--L-->
+    <string name="log_out">Log out</string>
+
+    <!--N-->
+    <string name="number_of_video">Number of video(s):</string>
+
+    <!--o-->
+    <string name="or">OR</string>
+
+    <!--P-->
+    <string name="password">Password</string>
+    <string name="profile_icon">Profile icon</string>
+    <string name="profile">Profile</string>
+
+
+    <!--S-->
+    <string name="signOut_succes">Sign out successfully!</string>
+    <string name="signIn">Sign in</string>
+    <string name="search">Search</string>
+
+    <!--U-->
+    <string name="username">Username</string>
+
+</resources>
