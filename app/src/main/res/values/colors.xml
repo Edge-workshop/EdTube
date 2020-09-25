@@ -10,4 +10,5 @@
     <color name="white">#FFFFFF</color>
     <color name="secondaryTextColor">#989DA2</color>
     <color name="profilIconBgColor">#E1CB00</color>
+    <color name="greenLetter">#0FD25B</color>
 </resources>

@@ -14,8 +14,8 @@
 <!--        app:layout_constraintTop_toTopOf="parent"-->
 <!--        app:layout_constraintDimensionRatio="1:1.3"/>-->
 
-    <com.google.android.youtube.player.YouTubeThumbnailView
-        android:id="@+id/vThumbnail"
+    <ImageView
+        android:id="@+id/ivThumbnail"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,12 +23,13 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintDimensionRatio="1:1.1"/>
 
+
     <TextView
         android:id="@+id/tvPlaylistTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/vThumbnail"
+        app:layout_constraintTop_toBottomOf="@+id/ivThumbnail"
         android:text="Playlist name"
         android:textStyle="bold"
         android:textAllCaps="true"

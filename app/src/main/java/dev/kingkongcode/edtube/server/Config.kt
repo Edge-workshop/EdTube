@@ -5,9 +5,11 @@ class Config {
     companion object{
         val current = Config()
     }
+    
 
-    val CLIENT_ID = "1033471762786-mps5q8anslk0aj5ojbujgc3183jgon8j.apps.googleusercontent.com"
-    val CLIENT_SECRET = "3YT2hRfVA8U7pSXWCGyc6LZv"
+    val CLIENT_ID = "CLIENT_ID"
+    val CLIENT_SECRET = "CLIENT_SECRET"
+    val API_KEY = "API_KEY"
 
     val OAUTH2_URL = "https://www.googleapis.com/oauth2/v4/token"
 

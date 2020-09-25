@@ -4,15 +4,15 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import com.android.volley.AuthFailureError
-import com.android.volley.BuildConfig
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken
 import dev.kingkongcode.edtube.model.PlaylistCategory
+import dev.kingkongcode.edtube.model.PlaylistItemActivity
 import dev.kingkongcode.edtube.util.Constants
 import org.json.JSONObject
 import java.util.*
+import kotlin.collections.ArrayList
 
 class APIManager {
 
@@ -34,10 +34,10 @@ class APIManager {
 
     private fun getRegularHeaders(): Map<String, String> {
         val headers = HashMap<String, String>()
-        headers["language"] = Locale.getDefault().displayLanguage
-        headers["version"] = BuildConfig.VERSION_NAME
-        //headers["Authorization"] = "Bearer$accessToken"
-        //headers["Accept"] = "application/json"
+//        headers["language"] = Locale.getDefault().displayLanguage
+//        headers["version"] = BuildConfig.VERSION_NAME
+        headers["Authorization"] = "Bearer $accessToken"
+        headers["Accept"] = "application/json"
 
         return headers
     }
@@ -109,7 +109,7 @@ class APIManager {
         this.ctx = context.applicationContext
         val sharedPreferences = ctx.getSharedPreferences("keystoragesaved", Context.MODE_PRIVATE)
 
-        val url = Constants.instance.YOUTUBE_BASE_URL+"/playlists?part=snippet%2CcontentDetails&maxResults=25&mine=true&access_token=${sharedPreferences.getString("access_token", "")}" // ClientError
+        val url = Constants.instance.YOUTUBE_BASE_URL+"/playlists?part=snippet%2CcontentDetails&maxResults=25&mine=true&access_token=${sharedPreferences.getString("access_token", "")}"
 
         Log.i("Req to obtain playlist",url)
         val queue = Volley.newRequestQueue(ctx)
@@ -146,5 +146,51 @@ class APIManager {
         queue.add(request)
     }
 
+
+    fun requestSelectedPlaylistDetails (context: Context, pListID: String,  completion: (error: String?, selectedPList: ArrayList<PlaylistItemActivity>?) -> Unit) {
+        this.ctx = context.applicationContext
+        val sharedPreferences = ctx.getSharedPreferences("keystoragesaved", Context.MODE_PRIVATE)
+
+        val url = Constants.instance.YOUTUBE_BASE_URL+"/playlistItems?part=contentDetails&part=id&part=snippet&part=status&playlistId=${pListID}&access_token=${sharedPreferences.getString("access_token", "")}"
+
+        Log.i("Req selected playlist",url)
+        val queue = Volley.newRequestQueue(ctx)
+
+        val bodyJSON = JSONObject()
+
+        val request = object : JsonObjectRequest(
+            Method.GET, url, bodyJSON,
+            Response.Listener { response ->
+                if (response != null) {
+
+                    val responseRecv =  PlaylistCategory(response)
+                    var userSelectedListRecv = arrayListOf<PlaylistItemActivity>()
+
+                    for (video in responseRecv.items){
+                        userSelectedListRecv.add(video)
+                    }
+
+                    completion(null, userSelectedListRecv)
+
+                } else {
+                    completion(unexpectedError, null)
+                }
+
+            },
+            Response.ErrorListener { error ->
+                completion(error.toString(), null)
+            }
+        ) {
+            @Throws(AuthFailureError::class)
+            override fun getHeaders(): Map<String, String> {
+
+                val headers = HashMap<String, String>()
+                headers.putAll(getRegularHeaders())
+                return headers
+            }
+        }
+
+        queue.add(request)
+    }
 
 }

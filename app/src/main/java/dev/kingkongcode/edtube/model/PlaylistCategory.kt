@@ -1,14 +1,13 @@
 package dev.kingkongcode.edtube.model
 
 import dev.kingkongcode.edtube.util.Constants
-import org.json.JSONArray
 import org.json.JSONObject
 
 class PlaylistCategory {
 
     var kind: String = Constants.instance.EMPTY_STRING
     var etag: String = Constants.instance.EMPTY_STRING
-    var items = ArrayList<PlaylistItem>()
+    var items = ArrayList<PlaylistItemActivity>()
 
     constructor(){
         this.kind = Constants.instance.EMPTY_STRING
@@ -23,7 +22,7 @@ class PlaylistCategory {
         jsonObject.optJSONArray("items")?.let {
             for (i in 0 until it.length()){
                 val jsonObj = it.optJSONObject(i)
-                this.items.add(PlaylistItem(jsonObj))
+                this.items.add(PlaylistItemActivity(jsonObj))
             }
         }
 

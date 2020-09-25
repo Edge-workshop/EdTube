@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -15,12 +16,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
-import com.google.android.material.bottomnavigation.BottomNavigationMenu
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.youtube.player.YouTubeBaseActivity
-import com.google.android.youtube.player.YouTubeInitializationResult
-import com.google.android.youtube.player.YouTubeThumbnailLoader
-import com.google.android.youtube.player.YouTubeThumbnailView
+import com.google.android.youtube.player.*
 import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.server.APIManager
 import dev.kingkongcode.edtube.util.HideSystemUi
@@ -28,7 +25,7 @@ import dev.kingkongcode.edtube.util.PaginationList
 import java.util.*
 
 
-class HomePage : YouTubeBaseActivity() {
+class HomePage : AppCompatActivity() {
 
     private val TAG = "HomePage"
     private lateinit var accessToken: String
@@ -41,7 +38,7 @@ class HomePage : YouTubeBaseActivity() {
 
     private lateinit var playlistGridView: GridView
     private lateinit var playlistAdapter: PlaylistAdapter
-    private var userPList = arrayListOf<dev.kingkongcode.edtube.model.PlaylistItem>()
+    private var userPList = arrayListOf<dev.kingkongcode.edtube.model.PlaylistItemActivity>()
 
     private lateinit var pageNbr: TextView
     private var currentPage: Int = 1
@@ -51,11 +48,6 @@ class HomePage : YouTubeBaseActivity() {
 
     private lateinit var bottomNav: BottomNavigationView
 
-//    private lateinit var youtubePlayerView: YouTubePlayerView
-//    private lateinit var onInitializedListener: YouTubePlayer.OnInitializedListener
-
-//    private var youtubeVideoID = "9wfRswYoex4"
-//    private val YOUTUBE_API_KEY = "AIzaSyA6okESac-Fhdlx6yqRG5QkSKswXxBgh5Y"
     private val RC_SIGN_IN = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -115,40 +107,10 @@ class HomePage : YouTubeBaseActivity() {
 
             ivProfilePic.setOnClickListener {
                 Toast.makeText(this@HomePage, "Profile icon is pressed", Toast.LENGTH_SHORT).show()
-                //youtubePlayerView.initialize(YOUTUBE_API_KEY,onInitializedListener)
 
             }
 
-
-            /**
-             * YouTube
-             * */
-
-//            youtubePlayerView = findViewById(R.id.youtubePlayerScreen)
-//            onInitializedListener = object : YouTubePlayer.OnInitializedListener {
-//                override fun onInitializationSuccess(
-//                    p0: YouTubePlayer.Provider?,
-//                    youtubePlayer: YouTubePlayer?,
-//                    p2: Boolean
-//                ) {
-//                    youtubePlayer?.loadVideo(youtubeVideoID)
-//                }
-//
-//                override fun onInitializationFailure(
-//                    p0: YouTubePlayer.Provider?,
-//                    p1: YouTubeInitializationResult?
-//                ) {
-//                    Toast.makeText(
-//                        this@HomePage,
-//                        "Something went wrong when loading video from YouTube!",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//                }
-//            }
-
-
         }
-        // youtubePlayerView.initialize(YOUTUBE_API_KEY,onInitializedListener)
 
         reqListApi()
 
@@ -156,11 +118,11 @@ class HomePage : YouTubeBaseActivity() {
             if (currentPage > 1){
                 currentPage -= 1
 
-                val (a, b) = PaginationList.showNbrPage(this,userPList,currentPage)
+                val (a, b) = PaginationList.showNbrPage(this, userPList, currentPage)
                 pageNbr.text = a
                 maxPage = b
 
-                val filterUserList = PaginationList.filterPage(this,userPList,currentPage)
+                val filterUserList = PaginationList.filterPage(this, userPList, currentPage)
                 playlistAdapter.clear()
                 for (itemList in filterUserList){
                     playlistAdapter.add(itemList)
@@ -173,11 +135,11 @@ class HomePage : YouTubeBaseActivity() {
             if (currentPage < maxPage){
                 currentPage += 1
 
-                val (a, b) = PaginationList.showNbrPage(this,userPList,currentPage)
+                val (a, b) = PaginationList.showNbrPage(this, userPList, currentPage)
                 pageNbr.text = a
                 maxPage = b
 
-                val filterUserList = PaginationList.filterPage(this,userPList,currentPage)
+                val filterUserList = PaginationList.filterPage(this, userPList, currentPage)
                 playlistAdapter.clear()
                 for (itemList in filterUserList){
                     playlistAdapter.add(itemList)
@@ -189,15 +151,15 @@ class HomePage : YouTubeBaseActivity() {
         bottomNav.setOnNavigationItemSelectedListener {
             when(it.itemId){
 
-                R.id.home_page_menu_home ->{
-                    Toast.makeText(this,"NOT Implemented yet",Toast.LENGTH_SHORT).show()
+                R.id.home_page_menu_home -> {
+
                     true
                 }
-                R.id.home_page_menu_search ->{
-                    Toast.makeText(this,"NOT Implemented yet",Toast.LENGTH_SHORT).show()
+                R.id.home_page_menu_search -> {
+                    Toast.makeText(this, "NOT Implemented yet", Toast.LENGTH_SHORT).show()
                     true
                 }
-                R.id.home_page_menu_log_out ->{
+                R.id.home_page_menu_log_out -> {
                     signOut()
                     true
                 }
@@ -276,11 +238,17 @@ class HomePage : YouTubeBaseActivity() {
             userPlaylist?.let {
                 userPList = it.items
 
-                val (a, b) = PaginationList.showNbrPage(this,userPList,currentPage)
+                val (a, b) = PaginationList.showNbrPage(this, userPList, currentPage)
                 pageNbr.text = a
                 maxPage = b
 
-                playlistAdapter = PlaylistAdapter(this, PaginationList.filterPage(this,userPList,currentPage))
+                playlistAdapter = PlaylistAdapter(
+                    this, PaginationList.filterPage(
+                        this,
+                        userPList,
+                        currentPage
+                    )
+                )
                 playlistGridView.adapter = playlistAdapter
             }
         })
@@ -288,29 +256,28 @@ class HomePage : YouTubeBaseActivity() {
 
 
     inner class PlaylistAdapter(
-        private var mContext: Context,
-        private val dataSet: List<dev.kingkongcode.edtube.model.PlaylistItem>
-    ) : ArrayAdapter<dev.kingkongcode.edtube.model.PlaylistItem?>(
+        private val mContext: Context, dataSet: List<dev.kingkongcode.edtube.model.PlaylistItemActivity>
+    ) : ArrayAdapter<dev.kingkongcode.edtube.model.PlaylistItemActivity?>(
         mContext,
         R.layout.playlist_cell,
         dataSet
     ), View.OnClickListener {
 
         private inner class ViewHolder {
-            var vThumbnail: YouTubeThumbnailView? = null
-            var tvPlaylistTitle: TextView? = null
-            var tvNbrOfVideo: TextView? = null
+            lateinit var ivThumbnail: ImageView
+            lateinit var tvPlaylistTitle: TextView
+            lateinit var tvNbrOfVideo: TextView
         }
 
         @Override
         override fun onClick(v: View) {}
         @Override
-        override fun getItem(position: Int): dev.kingkongcode.edtube.model.PlaylistItem? {
+        override fun getItem(position: Int): dev.kingkongcode.edtube.model.PlaylistItemActivity? {
             return super.getItem(position)
         }
         @Override
-        override fun getPosition(item: dev.kingkongcode.edtube.model.PlaylistItem?): Int {
-            return super.getPosition(item)
+        override fun getPosition(itemActivity: dev.kingkongcode.edtube.model.PlaylistItemActivity?): Int {
+            return super.getPosition(itemActivity)
         }
 
         @Override
@@ -325,7 +292,7 @@ class HomePage : YouTubeBaseActivity() {
                 viewHolder = ViewHolder()
                 val inflater = LayoutInflater.from(context)
                 convertView = inflater.inflate(R.layout.playlist_cell, parent, false)
-                viewHolder.vThumbnail = convertView.findViewById(R.id.vThumbnail)
+                viewHolder.ivThumbnail = convertView.findViewById(R.id.ivThumbnail)
                 viewHolder.tvPlaylistTitle = convertView.findViewById(R.id.tvPlaylistTitle)
                 viewHolder.tvNbrOfVideo = convertView.findViewById(R.id.tvNbrOfVideo)
                 result = convertView
@@ -341,45 +308,16 @@ class HomePage : YouTubeBaseActivity() {
                 val videoNbr = dataModel.detailsXItem.itemCountStr
                 viewHolder.tvNbrOfVideo!!.text = nbrOfVideoStr+videoNbr
 
-                //TODO thumbnails not working get that fix
-                //viewHolder.vThumbnail = dataModel.snippet.thumbnails.default.url
+                if (!dataModel.snippet.thumbnails.standard.url.isNullOrEmpty()){
+                    Glide.with(mContext).load(dataModel.snippet.thumbnails.high.url).into(viewHolder.ivThumbnail)
+                }
 
-//                viewHolder.vThumbnail?.initialize(
-//                    accessToken,
-//                    object : YouTubeThumbnailView.OnInitializedListener {
-//                        @Override
-//                        override fun onInitializationSuccess(
-//                            youTubeThumbnailView: YouTubeThumbnailView?,
-//                            youTubeThumbnailLoader: YouTubeThumbnailLoader
-//                        ) {
-//                            youTubeThumbnailLoader.setVideo("9wfRswYoex4")
-//                            youTubeThumbnailLoader.setOnThumbnailLoadedListener(object :
-//                                YouTubeThumbnailLoader.OnThumbnailLoadedListener {
-//                                @Override
-//                                override fun onThumbnailLoaded(
-//                                    youTubeThumbnailView: YouTubeThumbnailView?,
-//                                    s: String?
-//                                ) {
-//                                    youTubeThumbnailLoader.release()
-//                                }
-//
-//                                @Override
-//                                override fun onThumbnailError(
-//                                    youTubeThumbnailView: YouTubeThumbnailView?,
-//                                    errorReason: YouTubeThumbnailLoader.ErrorReason?
-//                                ) {
-//                                    errorReason?.name
-//                                }
-//                            })
-//                        }
-//
-//                        @Override
-//                        override fun onInitializationFailure(
-//                            youTubeThumbnailView: YouTubeThumbnailView?,
-//                            youTubeInitializationResult: YouTubeInitializationResult?
-//                        ) {
-//                        }
-//                    })
+                convertView?.setOnClickListener {
+                    val intent = Intent(this@HomePage,SelectedPListDetails::class.java)
+                    intent.putExtra("selectedListID",dataModel.id)
+                    startActivity(intent)
+                    finish()
+                }
 
                 notifyDataSetChanged()
             }

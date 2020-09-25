@@ -1,8 +1,10 @@
 package dev.kingkongcode.edtube.model
 
+import android.os.Parcel
+import android.os.Parcelable
 import org.json.JSONObject
 
-class Thumbnails {
+class Thumbnails : Parcelable{
 
     var default: ThumbnailsSettings = ThumbnailsSettings()
     var medium: ThumbnailsSettings = ThumbnailsSettings()
@@ -35,5 +37,33 @@ class Thumbnails {
 //        this.medium= ThumbnailsSettings(jsonObject)
 //        this.high= ThumbnailsSettings(jsonObject)
 //        this.standard= ThumbnailsSettings(jsonObject)
+    }
+
+    constructor(p: Parcel){
+        this.default = p.readParcelable(ThumbnailsSettings::class.java.classLoader)!!
+        this.medium = p.readParcelable(ThumbnailsSettings::class.java.classLoader)!!
+        this.high = p.readParcelable(ThumbnailsSettings::class.java.classLoader)!!
+        this.standard = p.readParcelable(ThumbnailsSettings::class.java.classLoader)!!
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    override fun writeToParcel(dest: Parcel?, p1: Int) {
+        dest?.writeParcelable(default, 0)
+        dest?.writeParcelable(medium, 0)
+        dest?.writeParcelable(high, 0)
+        dest?.writeParcelable(standard, 0)
+    }
+
+    companion object CREATOR: Parcelable.Creator<Thumbnails>{
+        override fun createFromParcel(source: Parcel): Thumbnails {
+            return Thumbnails(source)
+        }
+
+        override fun newArray(size: Int): Array<Thumbnails?> {
+            return arrayOfNulls(size)
+        }
     }
 }
