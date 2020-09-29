@@ -44,12 +44,10 @@ class APIManager {
 
 
     fun requestAccessToken(context: Context, idToken: String?, deviceCode: String?, completion: (error: String?) -> Unit) {
-
         this.ctx = context.applicationContext
-
         val url = "https://www.googleapis.com/oauth2/v4/token"
-
         Log.i("OAuth api accessToken",url)
+
         val queue = Volley.newRequestQueue(ctx)
 
         val bodyJSON = JSONObject()
@@ -83,11 +81,9 @@ class APIManager {
                     editor.commit()
 
                     completion(null)
-
                 } else {
                     completion(unexpectedError)
                 }
-
             },
             Response.ErrorListener { error ->
                 completion(error.toString())
@@ -95,13 +91,11 @@ class APIManager {
         ) {
             @Throws(AuthFailureError::class)
             override fun getHeaders(): Map<String, String> {
-
                 val headers = HashMap<String, String>()
                 headers.putAll(getRegularHeaders())
                 return headers
             }
         }
-
         queue.add(request)
     }
 
@@ -115,20 +109,16 @@ class APIManager {
         val queue = Volley.newRequestQueue(ctx)
 
         val bodyJSON = JSONObject()
-
         val request = object : JsonObjectRequest(
             Method.GET, url, bodyJSON,
             Response.Listener { response ->
                 if (response != null) {
-
                     val userPlaylistRecv = PlaylistCategory(response)
 
                     completion(null, userPlaylistRecv)
-
                 } else {
                     completion(unexpectedError, null)
                 }
-
             },
             Response.ErrorListener { error ->
                 completion(error.toString(), null)
@@ -136,13 +126,11 @@ class APIManager {
         ) {
             @Throws(AuthFailureError::class)
             override fun getHeaders(): Map<String, String> {
-
                 val headers = HashMap<String, String>()
                 headers.putAll(getRegularHeaders())
                 return headers
             }
         }
-
         queue.add(request)
     }
 
@@ -162,7 +150,6 @@ class APIManager {
             Method.GET, url, bodyJSON,
             Response.Listener { response ->
                 if (response != null) {
-
                     val responseRecv =  PlaylistCategory(response)
                     var userSelectedListRecv = arrayListOf<PlaylistItemActivity>()
 
@@ -171,7 +158,46 @@ class APIManager {
                     }
 
                     completion(null, userSelectedListRecv)
+                } else {
+                    completion(unexpectedError, null)
+                }
+            },
+            Response.ErrorListener { error ->
+                completion(error.toString(), null)
+            }
+        ) {
+            @Throws(AuthFailureError::class)
+            override fun getHeaders(): Map<String, String> {
+                val headers = HashMap<String, String>()
+                headers.putAll(getRegularHeaders())
+                return headers
+            }
+        }
+        queue.add(request)
+    }
 
+
+    fun requestSearchVideo (context: Context, requestWord: String,  completion: (error: String?, searchResultList: ArrayList<PlaylistItemActivity>?) -> Unit) {
+        this.ctx = context.applicationContext
+        val sharedPreferences = ctx.getSharedPreferences("keystoragesaved", Context.MODE_PRIVATE)
+        val url = Constants.instance.YOUTUBE_BASE_URL+"/search?part=snippet&maxResults=25&q=$requestWord&videoDuration=any&access_token=${sharedPreferences.getString("access_token", "")}"
+
+        Log.i("Req SearchVideo",url)
+        val queue = Volley.newRequestQueue(ctx)
+
+        val bodyJSON = JSONObject()
+        val request = object : JsonObjectRequest(
+            Method.GET, url, bodyJSON,
+            Response.Listener { response ->
+                if (response != null) {
+                    val responseRecv =  PlaylistCategory(response)
+                    var userSelectedListRecv = arrayListOf<PlaylistItemActivity>()
+
+                    for (video in responseRecv.items){
+                        userSelectedListRecv.add(video)
+                    }
+
+                    completion(null, userSelectedListRecv)
                 } else {
                     completion(unexpectedError, null)
                 }
@@ -183,13 +209,11 @@ class APIManager {
         ) {
             @Throws(AuthFailureError::class)
             override fun getHeaders(): Map<String, String> {
-
                 val headers = HashMap<String, String>()
                 headers.putAll(getRegularHeaders())
                 return headers
             }
         }
-
         queue.add(request)
     }
 

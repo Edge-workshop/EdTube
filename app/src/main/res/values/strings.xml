@@ -27,4 +27,7 @@
     <!--U-->
     <string name="username">Username</string>
 
+    <!--w-->
+    <string name="write_search_word">Search can not be empty</string>
+
 </resources>

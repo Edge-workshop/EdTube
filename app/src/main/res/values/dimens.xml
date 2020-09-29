@@ -7,7 +7,11 @@
     <dimen name="dimens_8">8dp</dimen>
     <dimen name="dimens_10">10dp</dimen>
     <dimen name="dimens_16">16dp</dimen>
+    <dimen name="dimens_32">32dp</dimen>
     <dimen name="dimens_40">40dp</dimen>
+    <dimen name="dimens_48">48dp</dimen>
+    <dimen name="dimens_56">56dp</dimen>
+    <dimen name="dimens_64">64dp</dimen>
 
 
     <!--P-->

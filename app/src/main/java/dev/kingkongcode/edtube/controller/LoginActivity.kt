@@ -26,14 +26,15 @@ import dev.kingkongcode.edtube.util.HideSystemUi
 class LoginActivity : AppCompatActivity() {
 
     private val TAG = "LoginActivity"
-    private lateinit var progressBar: ProgressBar
-
     private lateinit var googleSignInBtn : SignInButton
     private lateinit var mGoogleSignInClient : GoogleSignInClient
-    private val RC_SIGN_IN = 0
-    private val RC_GET_TOKEN = 90
+
+    private lateinit var progressBar: ProgressBar
 
     private lateinit var regSignInButton: Button
+
+    private val RC_SIGN_IN = 0
+    private val RC_GET_TOKEN = 90
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +53,7 @@ class LoginActivity : AppCompatActivity() {
 //            startActivity(intent)
             Toast.makeText(this,"NOT implemented yet",Toast.LENGTH_SHORT).show()
             Log.i(TAG, "Sign out")
+            //TODO don't fotget to remove sign out fun
             signOut()
         }
 
@@ -116,7 +118,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.i(TAG, "onActivityResult requestCode=$requestCode and resultCode=$resultCode")
+        Log.i(TAG, "onActivityResult requestCode= $requestCode and resultCode= $resultCode")
 
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {

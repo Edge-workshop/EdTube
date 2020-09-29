@@ -17,21 +17,21 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.youtube.player.*
 import dev.kingkongcode.edtube.R
+import dev.kingkongcode.edtube.model.ETUser
+import dev.kingkongcode.edtube.model.MyCustomDialog
 import dev.kingkongcode.edtube.server.APIManager
 import dev.kingkongcode.edtube.util.HideSystemUi
 import dev.kingkongcode.edtube.util.PaginationList
 import java.util.*
-
 
 class HomePage : AppCompatActivity() {
 
     private val TAG = "HomePage"
     private lateinit var accessToken: String
     private lateinit var sharedPreferences: SharedPreferences
-
     private lateinit var mGoogleSignInClient : GoogleSignInClient
+    private lateinit var progressBar: ProgressBar
 
     private lateinit var tvUsernameTitle: TextView
     private lateinit var ivProfilePic: ImageView
@@ -48,11 +48,13 @@ class HomePage : AppCompatActivity() {
 
     private lateinit var bottomNav: BottomNavigationView
 
+    private lateinit var etUser: ETUser
     private val RC_SIGN_IN = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_page)
+        Log.i(TAG,"onCreate is called")
 
         HideSystemUi.hideSystemUi(this)
 
@@ -63,6 +65,8 @@ class HomePage : AppCompatActivity() {
         val expiresIn = sharedPreferences.getInt("expires_in", 0)
         val tokenType = sharedPreferences.getString("token_type", "")
 
+        //ProgressBar
+        progressBar = findViewById(R.id.progressBar)
         //Main Title
         tvUsernameTitle = findViewById(R.id.tvUsernameBigTitle)
         //Profile Picture
@@ -79,41 +83,37 @@ class HomePage : AppCompatActivity() {
         bottomNav = findViewById(R.id.bottomNavigation)
 
         initiate()
-
     }
 
     private fun initiate() {
+        Log.i(TAG,"Function initiate is called")
+        progressBar.visibility = View.VISIBLE
 
         val acct = GoogleSignIn.getLastSignedInAccount(this)
         if (acct != null) {
-            //val personName = acct.displayName
-            val personGivenName = acct.givenName
-            //val personFamilyName = acct.familyName
-            //val personEmail = acct.email
-            //val personId = acct.id
-            val personPhoto: Uri? = acct.photoUrl
+            //Creating user
+            etUser = ETUser(acct.givenName,acct.familyName,acct.email,acct.photoUrl)
 
             //Code to display the right String in user lang
             val completeStringTitle = if (Locale.getDefault().isO3Language == "eng"){
-                "$personGivenName' s Playlist."
-            } else "La Playlist à $personGivenName."
-
+                "${etUser.firstName}' s Playlist."
+            } else "La Playlist à ${etUser.firstName}."
             tvUsernameTitle.text = completeStringTitle
 
             //Code to retreive profile pic from google sign in or else default pic
-            Glide.with(this).load(personPhoto).
+            Glide.with(this).load(etUser.userPhoto).
             diskCacheStrategy(DiskCacheStrategy.NONE).
             error(R.drawable.profile_pic_na).into(ivProfilePic)
 
             ivProfilePic.setOnClickListener {
-                Toast.makeText(this@HomePage, "Profile icon is pressed", Toast.LENGTH_SHORT).show()
-
+                Log.i(TAG,"User click on profil icon custom dialog show")
+                MyCustomDialog(etUser,this@HomePage).show(supportFragmentManager,"MyCustomFragment")
             }
-
         }
 
         reqListApi()
 
+        //Code section for Previous page with pagination function
         prevPageArrow.setOnClickListener {
             if (currentPage > 1){
                 currentPage -= 1
@@ -131,6 +131,7 @@ class HomePage : AppCompatActivity() {
             }
         }
 
+        //Code section for Next page with pagination function
         nextPageArrow.setOnClickListener {
             if (currentPage < maxPage){
                 currentPage += 1
@@ -148,15 +149,17 @@ class HomePage : AppCompatActivity() {
             }
         }
 
+        //Code section for Bottom Navigation menu item
         bottomNav.setOnNavigationItemSelectedListener {
             when(it.itemId){
-
                 R.id.home_page_menu_home -> {
-
                     true
                 }
                 R.id.home_page_menu_search -> {
-                    Toast.makeText(this, "NOT Implemented yet", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this@HomePage,SearchVideoActivity::class.java)
+                    intent.putExtra("ETUser",etUser)
+                    startActivity(intent)
+                    finish()
                     true
                 }
                 R.id.home_page_menu_log_out -> {
@@ -198,7 +201,7 @@ class HomePage : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.i(TAG, "onActivityResult requestCode=$requestCode and resultCode=$resultCode")
+        Log.i(TAG, "onActivityResult requestCode= $requestCode and resultCode= $resultCode")
 
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
@@ -224,6 +227,7 @@ class HomePage : AppCompatActivity() {
     }
 
     private fun signOut() {
+        Log.i(TAG,"Function signOut is called")
         mGoogleSignInClient.signOut()
             .addOnCompleteListener(this) {
                 Toast.makeText(this, getString(R.string.signOut_succes), Toast.LENGTH_LONG).show()
@@ -232,9 +236,15 @@ class HomePage : AppCompatActivity() {
     }
 
     private fun reqListApi(){
+        Log.i(TAG,"Request user list to api manager")
         APIManager.instance.requestUserPlaylist(this, completion = { error, userPlaylist ->
-            error?.let { }
+            Log.i(TAG,"APIManager requestUserPlaylist response receive in activity")
 
+            progressBar?.let { it.visibility = View.INVISIBLE }
+
+            error?.let {Toast.makeText(this@HomePage,error,Toast.LENGTH_SHORT).show() }
+
+            //Code section when we populate GridView adapter
             userPlaylist?.let {
                 userPList = it.items
 
@@ -287,7 +297,6 @@ class HomePage : AppCompatActivity() {
 
             // Check if an existing view is being reused, otherwise inflate the view
             val viewHolder: ViewHolder // view lookup cache stored in tag
-            val result: View
             if (convertView == null) {
                 viewHolder = ViewHolder()
                 val inflater = LayoutInflater.from(context)
@@ -295,26 +304,27 @@ class HomePage : AppCompatActivity() {
                 viewHolder.ivThumbnail = convertView.findViewById(R.id.ivThumbnail)
                 viewHolder.tvPlaylistTitle = convertView.findViewById(R.id.tvPlaylistTitle)
                 viewHolder.tvNbrOfVideo = convertView.findViewById(R.id.tvNbrOfVideo)
-                result = convertView
+
                 convertView.tag = viewHolder
             } else {
                 viewHolder = convertView.tag as ViewHolder
-                result = convertView
             }
 
             if (dataModel != null) {
-                viewHolder.tvPlaylistTitle!!.text = dataModel.snippet.title
+                viewHolder.tvPlaylistTitle.text = dataModel.snippet.title
                 val nbrOfVideoStr = getString(R.string.number_of_video)
                 val videoNbr = dataModel.detailsXItem.itemCountStr
-                viewHolder.tvNbrOfVideo!!.text = nbrOfVideoStr+videoNbr
+                viewHolder.tvNbrOfVideo.text = nbrOfVideoStr+"\t\t"+videoNbr
 
-                if (!dataModel.snippet.thumbnails.standard.url.isNullOrEmpty()){
+                if (dataModel.snippet.thumbnails.high.url.isNotEmpty()){
                     Glide.with(mContext).load(dataModel.snippet.thumbnails.high.url).into(viewHolder.ivThumbnail)
                 }
 
                 convertView?.setOnClickListener {
                     val intent = Intent(this@HomePage,SelectedPListDetails::class.java)
-                    intent.putExtra("selectedListID",dataModel.id)
+                    intent.putExtra("selectedListID",dataModel.listId)
+                    intent.putExtra("videoNbr",videoNbr)
+                    intent.putExtra("ETUser",etUser)
                     startActivity(intent)
                     finish()
                 }

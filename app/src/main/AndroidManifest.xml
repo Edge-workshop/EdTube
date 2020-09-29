@@ -13,11 +13,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".controller.VideoViewActivity"></activity>
-        <activity android:name=".controller.SelectedPListDetails" />
+        <activity
+            android:name=".controller.SearchVideoActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".controller.VideoViewActivity" />
+        <activity android:name=".controller.SelectedPListDetails"
+            android:screenOrientation="portrait"
+            />
         <activity
             android:name=".controller.HomePage"
-            android:theme="@style/AppThemeWithNoTopBar" />
+            android:theme="@style/AppThemeWithNoTopBar"
+            android:screenOrientation="portrait"
+            />
         <activity
             android:name=".controller.LoginActivity"
             android:screenOrientation="portrait"

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/ivThumbnail"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="16:9"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineMiddle"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <TextView
+        android:id="@+id/tvVideoTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimens_4"
+        android:layout_marginHorizontal="@dimen/dimens_8"
+        android:maxLines="3"
+        android:textSize="17sp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:text="Swag Surfin and Rolllin and waste and Ride 4 My Nxxxx and HYFR"
+        app:layout_constraintStart_toEndOf="@+id/guidelineMiddle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias=".15"
+        />
+
+    <TextView
+        android:id="@+id/tvAuthor"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/secondaryTextColor"
+        android:textSize="12sp"
+        android:text="Lil Wayne"
+        android:maxLines="2"
+        app:layout_constraintStart_toStartOf="@id/tvVideoTitle"
+        app:layout_constraintEnd_toEndOf="@id/tvVideoTitle"
+        app:layout_constraintTop_toBottomOf="@id/tvVideoTitle"
+        android:layout_marginTop="@dimen/dimens_4"
+        />
+
+    <TextView
+        android:id="@+id/tvDuration"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/secondaryTextColor"
+        android:textSize="12sp"
+        android:text="Last: 4:30"
+        android:maxLines="1"
+        app:layout_constraintStart_toStartOf="@id/tvVideoTitle"
+        app:layout_constraintEnd_toEndOf="@id/tvVideoTitle"
+        app:layout_constraintTop_toBottomOf="@id/tvAuthor"
+        android:layout_marginTop="@dimen/dimens_4"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineMiddle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".5"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

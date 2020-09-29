@@ -7,16 +7,21 @@ import org.json.JSONObject
 
 class PlaylistItemActivity : Parcelable{
 
+    //TODO remove activity in class name
+
     var kind: String = Constants.instance.EMPTY_STRING
     var etag: String = Constants.instance.EMPTY_STRING
-    var id: String = Constants.instance.EMPTY_STRING
+    var listId: String = Constants.instance.EMPTY_STRING
+    var id: YTRessource = YTRessource()
     var snippet: Snippet = Snippet()
     var detailsXItem: DetailsXItem = DetailsXItem()
+    var isVideoSelected: Boolean = false
 
     constructor(){
         this.kind = Constants.instance.EMPTY_STRING
         this.etag = Constants.instance.EMPTY_STRING
-        this.id = Constants.instance.EMPTY_STRING
+        this.listId = Constants.instance.EMPTY_STRING
+        this.id = YTRessource()
         this.snippet = Snippet()
         this.detailsXItem = DetailsXItem()
     }
@@ -24,7 +29,11 @@ class PlaylistItemActivity : Parcelable{
     constructor(jsonObject: JSONObject){
         this.kind = jsonObject.optString("kind")
         this.etag = jsonObject.optString("etag")
-        this.id = jsonObject.optString("id")
+        this.listId = jsonObject.optString("id")
+
+        jsonObject.optJSONObject("id")?.let {
+            this.id = YTRessource(it)
+        }
 
         jsonObject.optJSONObject("snippet")?.let {
            this.snippet = Snippet(it)
@@ -38,7 +47,8 @@ class PlaylistItemActivity : Parcelable{
     constructor(p: Parcel){
         this.kind = p.readString()?: Constants.instance.EMPTY_STRING
         this.etag = p.readString()?: Constants.instance.EMPTY_STRING
-        this.id = p.readString()?: Constants.instance.EMPTY_STRING
+        this.listId = p.readString()?: Constants.instance.EMPTY_STRING
+        this.id = p.readParcelable(YTRessource::class.java.classLoader)!!
         this.snippet = p.readParcelable(Snippet::class.java.classLoader)!!
         this.detailsXItem = p.readParcelable(DetailsXItem::class.java.classLoader)!!
 
@@ -52,7 +62,8 @@ class PlaylistItemActivity : Parcelable{
     override fun writeToParcel(dest: Parcel?, p1: Int) {
         dest?.writeString(kind)
         dest?.writeString(etag)
-        dest?.writeString(id)
+        dest?.writeString(listId)
+        dest?.writeParcelable(id,0)
         dest?.writeParcelable(snippet, 0)
         dest?.writeParcelable(detailsXItem, 0)
     }

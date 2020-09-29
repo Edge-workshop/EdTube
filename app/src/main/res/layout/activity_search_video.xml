@@ -4,10 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".controller.SelectedPListDetails">
+    tools:context=".controller.SearchVideoActivity"
+    android:id="@+id/mainView"
+    >
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarMenu"
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
         app:layout_constraintStart_toStartOf="parent"
@@ -121,63 +123,56 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <TextView
-        android:id="@+id/tvPlaylistTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="EDGE'S PLAYLIST"
-        android:textColor="@color/white"
-        android:textSize="28dp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appBarMenu"
-        android:layout_margin="@dimen/playlist_text_margin"/>
 
-    <TextView
-        android:id="@+id/tvNbrOfVideo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Number of video: 5"
-        android:textColor="@color/secondaryTextColor"
-        android:textSize="17sp"
-        app:layout_constraintStart_toStartOf="@+id/tvPlaylistTitle"
-        app:layout_constraintTop_toBottomOf="@+id/tvPlaylistTitle"
-        android:layout_marginTop="@dimen/dimens_4"/>
-
-    <ImageButton
-        android:id="@+id/ibPlayBtn"
-        android:layout_width="@dimen/dimens_40"
-        android:layout_height="@dimen/dimens_40"
-        android:src="@drawable/play_circle"
-        android:background="@android:color/transparent"
-        android:scaleType="fitXY"
+    <EditText
+        android:id="@+id/etSearchBar"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appBarMenu"
-        app:layout_constraintBottom_toTopOf="@+id/glTopThumbnail"
-        app:layout_constraintHorizontal_bias=".95"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
+        android:layout_marginHorizontal="@dimen/dimens_56"
+        android:paddingHorizontal="@dimen/dimens_8"
+        android:hint="Search in here"
+        android:maxLines="1"
         />
 
     <ImageView
-        android:id="@+id/ivSelectedThumbnail"
+        android:id="@+id/ivSearchLogo"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/search_logo"
+        android:layout_marginStart="@dimen/dimens_4"
+        android:padding="@dimen/dimens_8"
+        android:scaleType="fitCenter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/etSearchBar"
+        app:layout_constraintTop_toTopOf="@+id/etSearchBar"
+        app:layout_constraintBottom_toBottomOf="@+id/etSearchBar"/>
+
+    <ImageButton
+        android:id="@+id/ibConfirmOrDelete"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/check_icon"
+        android:layout_margin="@dimen/dimens_8"
+        android:padding="@dimen/dimens_8"
+        android:scaleType="fitCenter"
+        app:layout_constraintStart_toEndOf="@+id/etSearchBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/etSearchBar"
+        app:layout_constraintBottom_toBottomOf="@+id/etSearchBar"/>
+
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvYTVideoList"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/glTopThumbnail"
-        app:layout_constraintBottom_toBottomOf="@+id/glBottomThumbnail"/>
-
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvListVideo"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/glBottomThumbnail"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
-        android:layout_margin="@dimen/dimens_16"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/etSearchBar"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"/>
 
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -193,19 +188,5 @@
         android:visibility="visible"
         app:labelVisibilityMode="labeled"
         />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/glTopThumbnail"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".2"/>
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/glBottomThumbnail"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".6"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

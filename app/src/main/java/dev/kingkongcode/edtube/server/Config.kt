@@ -5,7 +5,7 @@ class Config {
     companion object{
         val current = Config()
     }
-    
+
 
     val CLIENT_ID = "CLIENT_ID"
     val CLIENT_SECRET = "CLIENT_SECRET"
