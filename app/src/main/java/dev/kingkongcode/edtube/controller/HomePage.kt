@@ -1,14 +1,16 @@
 package dev.kingkongcode.edtube.controller
 
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -19,9 +21,8 @@ import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.model.ETUser
-import dev.kingkongcode.edtube.model.MyCustomDialog
+import dev.kingkongcode.edtube.dialogs.MyCustomDialog
 import dev.kingkongcode.edtube.server.APIManager
-import dev.kingkongcode.edtube.util.HideSystemUi
 import dev.kingkongcode.edtube.util.PaginationList
 import java.util.*
 
@@ -33,7 +34,9 @@ class HomePage : AppCompatActivity() {
     private lateinit var mGoogleSignInClient : GoogleSignInClient
     private lateinit var progressBar: ProgressBar
 
+    private lateinit var layoutHomePageView: ConstraintLayout
     private lateinit var tvUsernameTitle: TextView
+
     private lateinit var ivProfilePic: ImageView
 
     private lateinit var playlistGridView: GridView
@@ -49,14 +52,16 @@ class HomePage : AppCompatActivity() {
     private lateinit var bottomNav: BottomNavigationView
 
     private lateinit var etUser: ETUser
-    private val RC_SIGN_IN = 0
+
+    companion object {
+        const val RC_SIGN_IN = 0
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_page)
         Log.i(TAG,"onCreate is called")
-
-        HideSystemUi.hideSystemUi(this)
 
         sharedPreferences = this.getSharedPreferences("keystoragesaved", Context.MODE_PRIVATE)
         val refreshToken = sharedPreferences.getString("refresh_token", "")
@@ -65,6 +70,8 @@ class HomePage : AppCompatActivity() {
         val expiresIn = sharedPreferences.getInt("expires_in", 0)
         val tokenType = sharedPreferences.getString("token_type", "")
 
+        //RootView
+        layoutHomePageView = findViewById(R.id.layoutHomePageView)
         //ProgressBar
         progressBar = findViewById(R.id.progressBar)
         //Main Title
@@ -118,11 +125,11 @@ class HomePage : AppCompatActivity() {
             if (currentPage > 1){
                 currentPage -= 1
 
-                val (a, b) = PaginationList.showNbrPage(this, userPList, currentPage)
+                val (a, b) = PaginationList.showNbrPage(userPList, currentPage)
                 pageNbr.text = a
                 maxPage = b
 
-                val filterUserList = PaginationList.filterPage(this, userPList, currentPage)
+                val filterUserList = PaginationList.filterPage(userPList, currentPage)
                 playlistAdapter.clear()
                 for (itemList in filterUserList){
                     playlistAdapter.add(itemList)
@@ -136,11 +143,11 @@ class HomePage : AppCompatActivity() {
             if (currentPage < maxPage){
                 currentPage += 1
 
-                val (a, b) = PaginationList.showNbrPage(this, userPList, currentPage)
+                val (a, b) = PaginationList.showNbrPage(userPList, currentPage)
                 pageNbr.text = a
                 maxPage = b
 
-                val filterUserList = PaginationList.filterPage(this, userPList, currentPage)
+                val filterUserList = PaginationList.filterPage(userPList, currentPage)
                 playlistAdapter.clear()
                 for (itemList in filterUserList){
                     playlistAdapter.add(itemList)
@@ -163,7 +170,7 @@ class HomePage : AppCompatActivity() {
                     true
                 }
                 R.id.home_page_menu_log_out -> {
-                    signOut()
+                    showLogOutDialog()
                     true
                 }
                 else -> false
@@ -226,8 +233,35 @@ class HomePage : AppCompatActivity() {
         }
     }
 
+    private fun showLogOutDialog(){
+        // build alert dialog
+        val dialogBuilder = AlertDialog.Builder(this)
+
+        // set message of alert dialog
+        dialogBuilder.setMessage("Do you want to close this application ?")
+            // if the dialog is cancelable
+            .setCancelable(false)
+            // positive button text and action
+            .setPositiveButton("YES", DialogInterface.OnClickListener {
+                    dialog, id -> signOut()
+            })
+            // negative button text and action
+            .setNegativeButton("NO", DialogInterface.OnClickListener {
+                    dialog, id -> dialog.cancel()
+                bottomNav.selectedItemId = R.id.home_page_menu_home
+            })
+
+        // create dialog box
+        val alert = dialogBuilder.create()
+        // set title for alert dialog box
+        alert.setTitle("EdTube")
+        // show alert dialog
+        alert.show()
+    }
+
     private fun signOut() {
         Log.i(TAG,"Function signOut is called")
+
         mGoogleSignInClient.signOut()
             .addOnCompleteListener(this) {
                 Toast.makeText(this, getString(R.string.signOut_succes), Toast.LENGTH_LONG).show()
@@ -248,13 +282,12 @@ class HomePage : AppCompatActivity() {
             userPlaylist?.let {
                 userPList = it.items
 
-                val (a, b) = PaginationList.showNbrPage(this, userPList, currentPage)
+                val (a, b) = PaginationList.showNbrPage(userPList, currentPage)
                 pageNbr.text = a
                 maxPage = b
 
                 playlistAdapter = PlaylistAdapter(
                     this, PaginationList.filterPage(
-                        this,
                         userPList,
                         currentPage
                     )
@@ -329,12 +362,10 @@ class HomePage : AppCompatActivity() {
                     finish()
                 }
 
-                notifyDataSetChanged()
             }
             return convertView!!
         }
     }
-
 
 
 }

@@ -1,13 +1,16 @@
 package dev.kingkongcode.edtube.controller
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.transition.Fade
 import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.ProgressBar
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityOptionsCompat
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -19,18 +22,21 @@ import com.google.android.gms.tasks.Task
 import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.server.APIManager
 import dev.kingkongcode.edtube.server.Config
-import dev.kingkongcode.edtube.util.Constants
-import dev.kingkongcode.edtube.util.HideSystemUi
 
 
 class LoginActivity : AppCompatActivity() {
 
     private val TAG = "LoginActivity"
-    private lateinit var googleSignInBtn : SignInButton
-    private lateinit var mGoogleSignInClient : GoogleSignInClient
+    private lateinit var xMainView: ConstraintLayout
 
     private lateinit var progressBar: ProgressBar
+    private lateinit var tvTitle: TextView
 
+    private lateinit var etUsername: EditText
+    private lateinit var etPassword: EditText
+    private lateinit var googleSignInBtn : SignInButton
+    private lateinit var tvOR: TextView
+    private lateinit var mGoogleSignInClient : GoogleSignInClient
     private lateinit var regSignInButton: Button
 
     private val RC_SIGN_IN = 0
@@ -41,36 +47,28 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
         Log.i(TAG, "onCreate is called")
 
-        HideSystemUi.hideSystemUi(this)
-
+        xMainView = findViewById(R.id.xMainView)
+        //Title
+        tvTitle = findViewById(R.id.tvTitle)
         //ProgressBar
         progressBar = findViewById(R.id.progressBar)
-
+        //Edit text for username
+        etUsername = findViewById(R.id.etUsername)
+        //Edit text for password
+        etPassword = findViewById(R.id.etPassword)
+        //OR text
+        tvOR = findViewById(R.id.tvOR)
         //Regular SignIn button
         regSignInButton = findViewById(R.id.btnRegSignIn)
-        regSignInButton.setOnClickListener {
-//            val intent = Intent(this@LoginActivity, HomePage::class.java)
-//            startActivity(intent)
-            Toast.makeText(this,"NOT implemented yet",Toast.LENGTH_SHORT).show()
-            Log.i(TAG, "Sign out")
-            //TODO don't fotget to remove sign out fun
-            signOut()
-        }
 
         //Google SignIn button
         googleSignInBtn = findViewById(R.id.signInBtn)
-        googleSignInBtn.setOnClickListener {
-            Log.i(TAG, "Google sign in button was click by user")
-            progressBar.visibility = View.VISIBLE
-            signIn()
-        }
-
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestScopes(Scope(Config.current.YOUTUBE_AUTH_READONLY))
             .requestScopes(Scope(Config.current.YOUTUBE_AUTH_UPLOAD))
-            .requestIdToken(Constants().APP_CLIENT_ID)
-            .requestServerAuthCode(Constants().APP_CLIENT_ID)
+            .requestIdToken(Config.current.CLIENT_ID)
+            .requestServerAuthCode(Config.current.CLIENT_ID)
             .requestEmail()
             .build()
 
@@ -79,15 +77,50 @@ class LoginActivity : AppCompatActivity() {
         // Build a GoogleApiClient with access to the Google Sign-In API and the
         // options specified by gso.
 
-    }
+        //obligatory check to make sure we're on 21+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val fade = Fade()
+            window.enterTransition = fade
+            window.exitTransition = fade
+        }
 
+        initiate()
+
+    }
     override fun onStart() {
         super.onStart()
-        Log.i(TAG, "onStart is called to check if user is already sign in with google auth")
+        showElementOnScreen()
+        //Log.i(TAG, "onStart is called to check if user is already sign in with google auth")
         //this section of code is to check if user is already sign in
-        val account = GoogleSignIn.getLastSignedInAccount(this)
+        //val account = GoogleSignIn.getLastSignedInAccount(this)
         //updateUI(account) fun to start an intent to next view
     }
+
+    override fun onResume() {
+        super.onResume()
+
+    }
+
+    private fun initiate() {
+
+        regSignInButton.setOnClickListener {
+//            val intent = Intent(this@LoginActivity, HomePage::class.java)
+//            startActivity(intent)
+            Toast.makeText(this, "NOT implemented yet", Toast.LENGTH_SHORT).show()
+            Log.i(TAG, "Sign out")
+            //TODO don't forget to remove sign out fun
+            signOut()
+        }
+
+        googleSignInBtn.setOnClickListener {
+            Log.i(TAG, "Google sign in button was click by user")
+            progressBar.visibility = View.VISIBLE
+            signIn()
+        }
+
+    }
+
+
 
     private fun getIdToken() {
         // Show an account picker to let the user choose a Google account from the device.
@@ -130,6 +163,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
+
         try {
             val account = completedTask.getResult(ApiException::class.java)
             val idToken = account?.idToken
@@ -143,25 +177,32 @@ class LoginActivity : AppCompatActivity() {
                 completion = { error ->
                     error?.let {
                         progressBar.visibility = View.INVISIBLE
-                        Toast.makeText(this@LoginActivity,"Access token request problem not yet localiseString login activity",Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@LoginActivity, error, Toast.LENGTH_SHORT).show()
                     }
 
                     /**
                      * Start next activity when api call to google services is complete and success
                      * **/
-                    Log.i(TAG, "Google access request is completed and successfull going to HomePage activity")
-                    val intent = Intent(this@LoginActivity, HomePage::class.java)
+                    Log.i(
+                        TAG,
+                        "Google access request is completed and successfull going to HomePage activity"
+                    )
+
+//                    val intent = Intent(this@LoginActivity, HomePage::class.java)
+//                    progressBar.visibility = View.INVISIBLE
+//                    startActivity(intent)
+
                     progressBar.visibility = View.INVISIBLE
-                    startActivity(intent)
+                    showImageTransition(xMainView, tvTitle)
 
                 })
-            // updateUI(account)
 
         } catch (e: ApiException) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w(TAG, "signInResult:failed code=" + e.statusCode)
         }
+
     }
 
     private fun signOut() {
@@ -171,6 +212,50 @@ class LoginActivity : AppCompatActivity() {
                 //finish()
             }
     }
+
+    private fun showImageTransition(view: View, text: TextView){
+        //setup element for view transition
+        val text = view.findViewById<TextView>(R.id.tvTitle)
+        val imagePair = androidx.core.util.Pair.create(text as View, "appTitle")
+
+//        val text2 = view.findViewById<TextView>(R.id.tvAppTitle)
+//        val imagePair2 = androidx.core.util.Pair.create(text2 as View, "appTitle")
+
+//        Check if we're running on Android 5.0 or higher (API 21)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // Apply activity transition
+            hideElementOnScreen()
+            val option = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                this@LoginActivity,
+                imagePair
+            )
+            val intent = Intent(this@LoginActivity, HomePage::class.java)
+            ActivityCompat.startActivity(this@LoginActivity, intent, option.toBundle())
+        } else {
+            // Swap without transition
+        }
+
+
+    }
+
+
+    fun showElementOnScreen(){
+        etUsername.visibility = View.VISIBLE
+        etPassword.visibility = View.VISIBLE
+        tvOR.visibility = View.VISIBLE
+        regSignInButton.visibility = View.VISIBLE
+        googleSignInBtn.visibility = View.VISIBLE
+    }
+
+    fun hideElementOnScreen(){
+        etUsername.visibility = View.INVISIBLE
+        etPassword.visibility = View.INVISIBLE
+        tvOR.visibility = View.INVISIBLE
+        regSignInButton.visibility = View.INVISIBLE
+        googleSignInBtn.visibility = View.INVISIBLE
+    }
+
+
 
 }
 

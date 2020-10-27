@@ -33,10 +33,6 @@ class Thumbnails : Parcelable{
             this.standard= ThumbnailsSettings(it)
         }
 
-//        this.default= ThumbnailsSettings(jsonObject.optJSONObject("default"))
-//        this.medium= ThumbnailsSettings(jsonObject)
-//        this.high= ThumbnailsSettings(jsonObject)
-//        this.standard= ThumbnailsSettings(jsonObject)
     }
 
     constructor(p: Parcel){

@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">EdTube</string>
 
+    <!--G-->
+    <string name="general_unexpected_error">An unexpected error has occurred, please try again later</string>
+
     <!--H-->
     <string name="home">Home</string>
 
@@ -20,7 +23,6 @@
 
 
     <!--S-->
-    <string name="signOut_succes">Sign out successfully!</string>
     <string name="signIn">Sign in</string>
     <string name="search">Search</string>
 
@@ -29,5 +31,9 @@
 
     <!--w-->
     <string name="write_search_word">Search can not be empty</string>
+    <string name="signOut_succes">Sign out successfully!</string>
+
+    <!--Y-->
+    <string name="youtube_video_error">Something went wrong when loading video from YouTube!</string>
 
 </resources>

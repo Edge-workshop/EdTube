@@ -1,6 +1,7 @@
 package dev.kingkongcode.edtube.controller
 
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,11 +20,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.model.ETUser
-import dev.kingkongcode.edtube.model.MyCustomDialog
+import dev.kingkongcode.edtube.dialogs.MyCustomDialog
 import dev.kingkongcode.edtube.model.PlaylistItemActivity
 import dev.kingkongcode.edtube.server.APIManager
-import dev.kingkongcode.edtube.util.Constants
-import dev.kingkongcode.edtube.util.HideSystemUi
 import java.util.*
 
 class SelectedPListDetails : AppCompatActivity() {
@@ -36,7 +36,7 @@ class SelectedPListDetails : AppCompatActivity() {
 
     private lateinit var tvPlaylistTitle: TextView
     private lateinit var tvNbrOfVideo: TextView
-    private lateinit var ibPlayBtn: ImageButton
+    private lateinit var ibPlayAllBtn: ImageButton
     private lateinit var ivSelectedThumbnail: ImageView
 
     private lateinit var youtubeVideoID: String
@@ -55,7 +55,7 @@ class SelectedPListDetails : AppCompatActivity() {
         Log.i(TAG,"onCreate is called")
 
         //Code full screen
-        HideSystemUi.hideSystemUi(this)
+//        HideSystemUi.hideSystemUi(this)
 
         //Progressbar
         progressBar = findViewById(R.id.progressBar)
@@ -66,7 +66,7 @@ class SelectedPListDetails : AppCompatActivity() {
         //Number of video text
         tvNbrOfVideo = findViewById(R.id.tvNbrOfVideo)
         //Play all button
-        ibPlayBtn = findViewById(R.id.ibPlayBtn)
+        ibPlayAllBtn = findViewById(R.id.ibPlayBtn)
         //Main selected thumbnail
         ivSelectedThumbnail = findViewById(R.id.ivSelectedThumbnail)
 
@@ -83,8 +83,6 @@ class SelectedPListDetails : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         Log.i(TAG,"onResume is called")
-        //Code full screen
-        HideSystemUi.hideSystemUi(this)
     }
 
     private fun initiate() {
@@ -96,7 +94,7 @@ class SelectedPListDetails : AppCompatActivity() {
         playlistAdapter = PlaylistAdapter(this@SelectedPListDetails, this.mPlayList)
         rvListVideo.adapter = playlistAdapter
 
-        var videoNbr = Constants.instance.EMPTY_STRING
+        var videoNbr: String
         val extras: Bundle? = intent.extras
         if (extras != null) {
             //Getting user info
@@ -131,6 +129,19 @@ class SelectedPListDetails : AppCompatActivity() {
             startActivity(intent)
         }
 
+        ibPlayAllBtn.setOnClickListener {
+            val allVideoId = arrayListOf<String>()
+
+            for (videoId in this.mPlayList){
+                allVideoId.add(videoId.snippet.ressourceId.videoId)
+            }
+
+            val intent = Intent(this@SelectedPListDetails,VideoViewActivity::class.java)
+            intent.putExtra("playAll",allVideoId)
+            startActivity(intent)
+        }
+
+
         //Code section for Bottom Navigation menu item
         bottomNavigation.setOnNavigationItemSelectedListener {
             when(it.itemId){
@@ -148,7 +159,7 @@ class SelectedPListDetails : AppCompatActivity() {
                     true
                 }
                 R.id.home_page_menu_log_out -> {
-                    signOut()
+                    showLogOutDialog()
                     true
                 }
                 else -> false
@@ -160,7 +171,7 @@ class SelectedPListDetails : AppCompatActivity() {
     private fun requestSelectedPList(selectedID: String){
         Log.i(TAG,"Function requestSelectedPList was called")
 
-        APIManager.instance.requestSelectedPlaylistDetails(this@SelectedPListDetails,selectedID, completion = { error, selectedPList ->
+        APIManager.instance.requestSelectedPlaylistDetails(this@SelectedPListDetails,selectedID, null, completion = { error, selectedPList ->
             Log.i(TAG,"APIManager requestSelectedPlaylistDetails response receive in activity")
 
             error?.let { Toast.makeText(this@SelectedPListDetails,error,Toast.LENGTH_SHORT).show() }
@@ -180,6 +191,32 @@ class SelectedPListDetails : AppCompatActivity() {
             progressBar.visibility = View.INVISIBLE
         })
 
+    }
+
+    private fun showLogOutDialog(){
+        // build alert dialog
+        val dialogBuilder = AlertDialog.Builder(this)
+
+        // set message of alert dialog
+        dialogBuilder.setMessage("Do you want to close this application ?")
+            // if the dialog is cancelable
+            .setCancelable(false)
+            // positive button text and action
+            .setPositiveButton("YES", DialogInterface.OnClickListener {
+                    dialog, id -> signOut()
+            })
+            // negative button text and action
+            .setNegativeButton("NO", DialogInterface.OnClickListener {
+                    dialog, id -> dialog.cancel()
+                bottomNavigation.selectedItemId = R.id.home_page_menu_home
+            })
+
+        // create dialog box
+        val alert = dialogBuilder.create()
+        // set title for alert dialog box
+        alert.setTitle("EdTube")
+        // show alert dialog
+        alert.show()
     }
 
     private fun signOut() {
@@ -245,8 +282,8 @@ class SelectedPListDetails : AppCompatActivity() {
                 Log.i(TAG,"User click on specific playlist title: ${video.snippet.title} row position: $position")
 
                 //Code section to send image thumbnails to main view when user click on specific row
-                if (!video.snippet.thumbnails.standard.url.isNullOrEmpty()){
-                    Glide.with(mContext).load(video.snippet.thumbnails.standard.url).into(ivSelectedThumbnail)
+                if (!video.snippet.thumbnails.high.url.isNullOrEmpty()){
+                    Glide.with(mContext).load(video.snippet.thumbnails.high.url).into(ivSelectedThumbnail)
                     youtubeVideoID = video.snippet.ressourceId.videoId
                 }
 

@@ -1,27 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="175dp"
+    android:layout_width="170dp"
+    android:layout_height="225dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/primaryBgGrey"
-    android:layout_height="255dp">
-
-<!--    <View-->
-<!--        android:id="@+id/vThumbnail"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="0dp"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintDimensionRatio="1:1.3"/>-->
+    >
 
     <ImageView
         android:id="@+id/ivThumbnail"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:scaleType="centerCrop"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintDimensionRatio="1:1.1"/>
+        app:layout_constraintDimensionRatio="1:1"/>
 
 
     <TextView
@@ -30,23 +24,25 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivThumbnail"
-        android:text="Playlist name"
+        tools:text="Playlist name"
         android:textStyle="bold"
         android:textAllCaps="true"
         android:textSize="@dimen/playlist_cell_main_title"
         android:textColor="@color/white"
-        android:layout_margin="@dimen/playlist_text_margin"/>
+        android:layout_marginTop="@dimen/dimens_4"
+        android:layout_marginStart="@dimen/dimens_8"
+        />
 
     <TextView
         android:id="@+id/tvNbrOfVideo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Number of Video: 35"
+        tools:text="Number of Video: 35"
         android:textColor="@color/secondaryTextColor"
         android:textSize="@dimen/playlist_sec_text_size"
         app:layout_constraintStart_toStartOf="@+id/tvPlaylistTitle"
         app:layout_constraintTop_toBottomOf="@+id/tvPlaylistTitle"
-        android:layout_marginTop="@dimen/playlist_text_margin"/>
+        />
 
 
 

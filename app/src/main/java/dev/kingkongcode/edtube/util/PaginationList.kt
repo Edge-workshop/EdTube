@@ -7,15 +7,7 @@ class PaginationList {
 
     companion object{
 
-//        fun showNbrPage(mContext: Context, listItems: ArrayList<dev.kingkongcode.edtube.model.PlaylistItem>, currentPage: Int) : String{
-//            val totalOfItems = listItems.size
-//            val nbrOfItemsPerPage = 4.0
-//            val totalOfPage: Int = ceil(totalOfItems /nbrOfItemsPerPage).toInt()
-//
-//            return "$currentPage/$totalOfPage"
-//        }
-
-        fun showNbrPage(mContext: Context, listItemActivities: ArrayList<dev.kingkongcode.edtube.model.PlaylistItemActivity>, currentPage: Int) : Pair<String,Int>{
+        fun showNbrPage(listItemActivities: ArrayList<dev.kingkongcode.edtube.model.PlaylistItemActivity>, currentPage: Int) : Pair<String,Int>{
             val totalOfItems = listItemActivities.size
             val nbrOfItemsPerPage = 4.0
             val totalOfPage: Int = ceil(totalOfItems /nbrOfItemsPerPage).toInt()
@@ -23,7 +15,7 @@ class PaginationList {
             return Pair("$currentPage/$totalOfPage",totalOfPage)
         }
 
-        fun filterPage(mContext: Context, listItemActivities: ArrayList<dev.kingkongcode.edtube.model.PlaylistItemActivity>, currentPage: Int) : ArrayList<dev.kingkongcode.edtube.model.PlaylistItemActivity>{
+        fun filterPage(listItemActivities: ArrayList<dev.kingkongcode.edtube.model.PlaylistItemActivity>, currentPage: Int) : ArrayList<dev.kingkongcode.edtube.model.PlaylistItemActivity>{
             var filterList = ArrayList<dev.kingkongcode.edtube.model.PlaylistItemActivity>()
 
             //val maxIndex = listItems.size - 1

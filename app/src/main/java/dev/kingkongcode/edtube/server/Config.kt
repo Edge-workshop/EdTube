@@ -7,9 +7,9 @@ class Config {
     }
 
 
-    val CLIENT_ID = "CLIENT_ID"
-    val CLIENT_SECRET = "CLIENT_SECRET"
-    val API_KEY = "API_KEY"
+    val CLIENT_ID = ""
+    val CLIENT_SECRET = ""
+    val API_KEY = ""
 
     val OAUTH2_URL = "https://www.googleapis.com/oauth2/v4/token"
 

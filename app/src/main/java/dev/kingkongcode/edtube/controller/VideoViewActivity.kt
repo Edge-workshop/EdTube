@@ -1,5 +1,6 @@
 package dev.kingkongcode.edtube.controller
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageButton
@@ -13,14 +14,15 @@ import dev.kingkongcode.edtube.server.Config
 import dev.kingkongcode.edtube.util.HideSystemUi
 
 class VideoViewActivity : YouTubeBaseActivity() {
-    //TODO find solution to keep track on videostreaming time with savedInstanceState to keep track when changing device orientaton
     private val TAG = "VideoViewActivity"
 
     private lateinit var btnBack: ImageButton
 
     private lateinit var ytYoutubePlayer: YouTubePlayerView
     private lateinit var onInitializedListener: YouTubePlayer.OnInitializedListener
-    private lateinit var youtubeVideoID: String
+    private var youtubeVideoID: String? = null
+    private var allVideoIDStr: ArrayList<String>? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,14 +41,46 @@ class VideoViewActivity : YouTubeBaseActivity() {
         val extras: Bundle? = intent.extras
         if (extras != null) {
             //Code to retrieve youtubeVideoID
-            youtubeVideoID = extras.getString("youtubeVideoID")!!
+            youtubeVideoID = extras.getString("youtubeVideoID")
+            //to retrieve list of string id
+            allVideoIDStr = extras.getStringArrayList("playAll")
         }
 
         initiate()
     }
 
+    @Override
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+    }
+
     private fun initiate() {
         Log.i(TAG, "Function initiate is called")
+
+        val playbackEventListener = object: YouTubePlayer.PlaybackEventListener {
+            override fun onSeekTo(p0: Int) {}
+            override fun onBuffering(p0: Boolean) {}
+
+            override fun onPlaying() { Log.i(TAG,"Good, video is playing ok") }
+
+            override fun onStopped() { Log.i(TAG,"Video has stopped") }
+
+            override fun onPaused() { Log.i(TAG,"Video has paused") }
+        }
+
+        val playerStateChangeListener = object: YouTubePlayer.PlayerStateChangeListener {
+            override fun onAdStarted() { Log.i(TAG,"Click Ad now, make the video creator rich!") }
+
+            override fun onLoading() {}
+
+            override fun onVideoStarted() { Log.i(TAG,"Video has started") }
+
+            override fun onLoaded(p0: String?) {}
+
+            override fun onVideoEnded() { Log.i(TAG,"Congratulations! You've completed another video.") }
+
+            override fun onError(p0: YouTubePlayer.ErrorReason?) { Log.i(TAG,"error") }
+        }
 
         onInitializedListener =  object : YouTubePlayer.OnInitializedListener{
             override fun onInitializationSuccess(
@@ -54,8 +88,14 @@ class VideoViewActivity : YouTubeBaseActivity() {
                 youtubePlayer: YouTubePlayer?,
                 p2: Boolean
             ) {
-                //Code section where to lauch video
-                youtubePlayer?.loadVideo(youtubeVideoID)
+                //Code section where to launch video
+                youtubeVideoID?.let {
+                    allVideoIDStr = arrayListOf()
+                    allVideoIDStr!!.add(youtubeVideoID!!)
+                }
+                youtubePlayer?.cueVideos(allVideoIDStr)
+                youtubePlayer?.setPlayerStateChangeListener(playerStateChangeListener)
+                youtubePlayer?.setPlaybackEventListener(playbackEventListener)
             }
 
             override fun onInitializationFailure(
@@ -64,7 +104,7 @@ class VideoViewActivity : YouTubeBaseActivity() {
             ) {
                 Toast.makeText(
                     this@VideoViewActivity,
-                    "Something went wrong when loading video from YouTube!",
+                    getString(R.string.youtube_video_error),
                     Toast.LENGTH_SHORT
                 ).show()
             }

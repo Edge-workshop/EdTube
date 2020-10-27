@@ -1,8 +1,8 @@
 package dev.kingkongcode.edtube.controller
 
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,10 +21,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.model.ETUser
-import dev.kingkongcode.edtube.model.MyCustomDialog
+import dev.kingkongcode.edtube.dialogs.MyCustomDialog
 import dev.kingkongcode.edtube.model.PlaylistItemActivity
 import dev.kingkongcode.edtube.server.APIManager
-import dev.kingkongcode.edtube.util.HideSystemUi
 
 class SearchVideoActivity : AppCompatActivity() {
 
@@ -50,9 +50,6 @@ class SearchVideoActivity : AppCompatActivity() {
         setContentView(R.layout.activity_search_video)
         Log.i(TAG,"onCreate is called")
 
-        //Code section Fullscreen
-        HideSystemUi.hideSystemUi(this)
-
         //Main Layout view
         main = findViewById(R.id.mainView)
         //ProgressBar
@@ -70,7 +67,8 @@ class SearchVideoActivity : AppCompatActivity() {
         rvYTVideoList.layoutManager = linearLayoutManager
         //Bottom Navigation
         bottomNavigation = findViewById(R.id.bottomNavigation)
-        //TODO find solution to put item[1] hightlighted
+        bottomNavigation.selectedItemId = R.id.home_page_menu_search
+
 
         //Initialize RecycleView and adapter
         playlistAdapter = VideoListAdapter(this@SearchVideoActivity,this.mSearchResultList)
@@ -85,7 +83,7 @@ class SearchVideoActivity : AppCompatActivity() {
         val extras: Bundle? = intent.extras
         if (extras != null){
             //Getting user info
-            etUser = extras.getParcelable<ETUser>("ETUser")!!
+            etUser = extras.getParcelable("ETUser")!!
 
             //Code to retreive profile pic from google sign in or else default pic
             Glide.with(this).load(etUser.userPhoto).
@@ -107,12 +105,13 @@ class SearchVideoActivity : AppCompatActivity() {
         //Bouton Search
         var isDeleting = false
         ibConfirmOrDelete.setOnClickListener {
-            HideSystemUi.hideSystemUi(this)
+//            HideSystemUi.hideSystemUi(this)
 
             if (!etSearchBar.text.isNullOrEmpty() && !isDeleting){
                 isDeleting = true
                 progressBar.visibility = View.VISIBLE
-                ibConfirmOrDelete.setImageResource(R.drawable.clear_icon)
+//                ibConfirmOrDelete.setImageResource(R.drawable.clear_icon)
+                ibConfirmOrDelete.setImageResource(R.drawable.ic_morph_reverse)
 
                 APIManager.instance.requestSearchVideo(this@SearchVideoActivity, etSearchBar.text.toString(), completion = { error, searchResultList ->
                     error?.let { Toast.makeText(this@SearchVideoActivity,error,Toast.LENGTH_SHORT).show() }
@@ -136,7 +135,8 @@ class SearchVideoActivity : AppCompatActivity() {
             }else if (!etSearchBar.text.isNullOrEmpty() && isDeleting){
                 etSearchBar.text.clear()
                 isDeleting = false
-                ibConfirmOrDelete.setImageResource(R.drawable.check_icon)
+//                ibConfirmOrDelete.setImageResource(R.drawable.check_icon)
+                ibConfirmOrDelete.setImageResource(R.drawable.ic_morph)
 
                 //Code section to automatically hide editText Keyboard
                 main.performClick()
@@ -157,13 +157,39 @@ class SearchVideoActivity : AppCompatActivity() {
                     true
                 }
                 R.id.home_page_menu_log_out -> {
-                    signOut()
+                    showLogOutDialog()
                     true
                 }
                 else -> false
             }
         }
 
+    }
+
+    private fun showLogOutDialog(){
+        // build alert dialog
+        val dialogBuilder = AlertDialog.Builder(this)
+
+        // set message of alert dialog
+        dialogBuilder.setMessage("Do you want to close this application ?")
+            // if the dialog is cancelable
+            .setCancelable(false)
+            // positive button text and action
+            .setPositiveButton("YES", DialogInterface.OnClickListener {
+                    dialog, id -> signOut()
+            })
+            // negative button text and action
+            .setNegativeButton("NO", DialogInterface.OnClickListener {
+                    dialog, id -> dialog.cancel()
+                bottomNavigation.selectedItemId = R.id.home_page_menu_search
+            })
+
+        // create dialog box
+        val alert = dialogBuilder.create()
+        // set title for alert dialog box
+        alert.setTitle("EdTube")
+        // show alert dialog
+        alert.show()
     }
 
     private fun signOut() {

@@ -7,6 +7,7 @@ import com.android.volley.AuthFailureError
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.model.PlaylistCategory
 import dev.kingkongcode.edtube.model.PlaylistItemActivity
 import dev.kingkongcode.edtube.util.Constants
@@ -17,12 +18,9 @@ import kotlin.collections.ArrayList
 class APIManager {
 
     private lateinit var ctx: Context
-
     private val sharedPrefFile = "keystoragesaved"
-
-    private val unexpectedError = "Une erreur inattendue est survenue, veuillez réessayer plus tard"
-
-    private var accessToken = ""
+    private var accessToken = Constants.instance.EMPTY_STRING
+    private var userSelectedListRecv = arrayListOf<PlaylistItemActivity>()
 
     companion object{
         var instance: APIManager = APIManager()
@@ -45,7 +43,7 @@ class APIManager {
 
     fun requestAccessToken(context: Context, idToken: String?, deviceCode: String?, completion: (error: String?) -> Unit) {
         this.ctx = context.applicationContext
-        val url = "https://www.googleapis.com/oauth2/v4/token"
+        val url = Constants.instance.GOOGLE_AUTH2
         Log.i("OAuth api accessToken",url)
 
         val queue = Volley.newRequestQueue(ctx)
@@ -54,7 +52,7 @@ class APIManager {
         bodyJSON.put("grant_type", "authorization_code")
         bodyJSON.put("client_id", Config.current.CLIENT_ID)
         bodyJSON.put("client_secret", Config.current.CLIENT_SECRET)
-        bodyJSON.put("redirect_uri", "")
+        bodyJSON.put("redirect_uri", Constants.instance.EMPTY_STRING)
         bodyJSON.put("code", deviceCode)
         bodyJSON.put("id_token", idToken)
 
@@ -63,26 +61,21 @@ class APIManager {
             Response.Listener { response ->
                 if (response != null) {
 
-                    val refreshToken = response.optString("refresh_token")
-                    val idToken = response.optString("id_token")
-                    val accessToken = response.optString("access_token")
-                    val expireIn = response.optInt("expires_in")
-                    val tokenType = response.optString("token_type")
-                    this.accessToken = accessToken
+                    this.accessToken = response.optString("access_token")
 
                     val sharedPreferences: SharedPreferences = this.ctx.getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
                     val editor:SharedPreferences.Editor =  sharedPreferences.edit()
-                    editor.putString("refresh_token",refreshToken)
-                    editor.putString("id_token",idToken)
-                    editor.putString("access_token",accessToken)
-                    editor.putInt("expires_in",expireIn)
-                    editor.putString("token_type",tokenType)
+                    editor.putString("refresh_token",response.optString("refresh_token"))
+                    editor.putString("id_token",response.optString("id_token"))
+                    editor.putString("access_token",response.optString("access_token"))
+                    editor.putInt("expires_in",response.optInt("expires_in"))
+                    editor.putString("token_type",response.optString("token_type"))
                     editor.apply()
                     editor.commit()
 
                     completion(null)
                 } else {
-                    completion(unexpectedError)
+                    completion(R.string.general_unexpected_error.toString())
                 }
             },
             Response.ErrorListener { error ->
@@ -98,6 +91,7 @@ class APIManager {
         }
         queue.add(request)
     }
+
 
     fun requestUserPlaylist(context: Context, completion: (error: String?, userPlaylist: PlaylistCategory?) -> Unit) {
         this.ctx = context.applicationContext
@@ -117,7 +111,7 @@ class APIManager {
 
                     completion(null, userPlaylistRecv)
                 } else {
-                    completion(unexpectedError, null)
+                    completion(R.string.general_unexpected_error.toString(), null)
                 }
             },
             Response.ErrorListener { error ->
@@ -135,11 +129,12 @@ class APIManager {
     }
 
 
-    fun requestSelectedPlaylistDetails (context: Context, pListID: String,  completion: (error: String?, selectedPList: ArrayList<PlaylistItemActivity>?) -> Unit) {
+    fun requestSelectedPlaylistDetails (context: Context, pListID: String,  nextPageToken: String?, completion: (error: String?, selectedPList: ArrayList<PlaylistItemActivity>?) -> Unit) {
         this.ctx = context.applicationContext
         val sharedPreferences = ctx.getSharedPreferences("keystoragesaved", Context.MODE_PRIVATE)
 
-        val url = Constants.instance.YOUTUBE_BASE_URL+"/playlistItems?part=contentDetails&part=id&part=snippet&part=status&playlistId=${pListID}&access_token=${sharedPreferences.getString("access_token", "")}"
+        var url = Constants.instance.YOUTUBE_BASE_URL+"/playlistItems?part=contentDetails&part=id&part=snippet&part=status&playlistId=${pListID}&access_token=${sharedPreferences.getString("access_token", "")}"
+        nextPageToken?.let { url += "&pageToken=$nextPageToken" }
 
         Log.i("Req selected playlist",url)
         val queue = Volley.newRequestQueue(ctx)
@@ -151,15 +146,19 @@ class APIManager {
             Response.Listener { response ->
                 if (response != null) {
                     val responseRecv =  PlaylistCategory(response)
-                    var userSelectedListRecv = arrayListOf<PlaylistItemActivity>()
-
                     for (video in responseRecv.items){
                         userSelectedListRecv.add(video)
                     }
 
-                    completion(null, userSelectedListRecv)
+                    //Code section to check if there is another page in the result to fetch before sending back to Activity
+                    if (!responseRecv.nextPageToken.isNullOrEmpty()){
+                        requestSelectedPlaylistDetails(context, pListID, responseRecv.nextPageToken, completion)
+                    }else {
+                        completion(null, userSelectedListRecv)
+                        userSelectedListRecv.clear()
+                    }
                 } else {
-                    completion(unexpectedError, null)
+                    completion(R.string.general_unexpected_error.toString(), null)
                 }
             },
             Response.ErrorListener { error ->
@@ -199,7 +198,7 @@ class APIManager {
 
                     completion(null, userSelectedListRecv)
                 } else {
-                    completion(unexpectedError, null)
+                    completion(R.string.general_unexpected_error.toString(), null)
                 }
 
             },

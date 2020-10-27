@@ -1,4 +1,4 @@
-package dev.kingkongcode.edtube.model
+package dev.kingkongcode.edtube.dialogs
 
 import android.app.Activity
 import android.os.Bundle
@@ -12,7 +12,7 @@ import androidx.fragment.app.DialogFragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import dev.kingkongcode.edtube.R
-import dev.kingkongcode.edtube.util.HideSystemUi
+import dev.kingkongcode.edtube.model.ETUser
 
 class MyCustomDialog(private val user: ETUser, private val activity: Activity) : DialogFragment() {
 
@@ -48,7 +48,7 @@ class MyCustomDialog(private val user: ETUser, private val activity: Activity) :
         viewHolder.tvemail.text = user.email
 
         viewHolder.btnOk.setOnClickListener {
-            HideSystemUi.hideSystemUi(this.activity)
+//            HideSystemUi.hideSystemUi(this.activity)
             dismiss()
         }
 

@@ -7,6 +7,7 @@ class PlaylistCategory {
 
     var kind: String = Constants.instance.EMPTY_STRING
     var etag: String = Constants.instance.EMPTY_STRING
+    lateinit var nextPageToken: String
     var items = ArrayList<PlaylistItemActivity>()
 
     constructor(){
@@ -18,6 +19,7 @@ class PlaylistCategory {
     constructor(jsonObject: JSONObject){
         this.kind = jsonObject.optString("kind")
         this.etag = jsonObject.optString("etag")
+        this.nextPageToken = jsonObject.optString("nextPageToken")
 
         jsonObject.optJSONArray("items")?.let {
             for (i in 0 until it.length()){

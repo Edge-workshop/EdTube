@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/primaryBgBlack"
-    tools:context=".controller.LoginActivity">
+    tools:context=".controller.LoginActivity"
+    android:id="@+id/xMainView"
+    >
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -19,12 +21,13 @@
 
     <TextView
         android:id="@+id/tvTitle"
+        android:transitionName="appTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/app_name"
-        android:textSize="60sp"
+        android:textSize="50sp"
         android:textColor="@color/red"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -33,29 +36,33 @@
 
     <EditText
         android:id="@+id/etUsername"
-        android:layout_width="250dp"
-        android:layout_height="50dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:inputType="text"
         android:background="#F9F9F9"
         android:hint="@string/username"
         android:textColorHint="@color/secondaryTextColor"
         android:padding="8dp"
+        android:layout_marginHorizontal="80dp"
+        app:layout_constraintDimensionRatio="9:1.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintVertical_bias=".45"
-        android:autofillHints="" />
+        />
 
     <EditText
         android:id="@+id/etPassword"
-        android:layout_width="250dp"
-        android:layout_height="50dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:background="#F9F9F9"
         android:hint="@string/password"
         android:textColorHint="@color/secondaryTextColor"
         android:inputType="textPassword"
         android:padding="8dp"
+        android:layout_marginHorizontal="80dp"
+        app:layout_constraintDimensionRatio="9:1.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etUsername"
@@ -64,9 +71,11 @@
 
     <Button
         android:id="@+id/btnRegSignIn"
-        android:layout_width="200dp"
-        android:layout_height="50dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:text="@string/signIn"
+        android:layout_marginHorizontal="110dp"
+        app:layout_constraintDimensionRatio="9:2.1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etPassword"
@@ -86,8 +95,10 @@
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/signInBtn"
-        android:layout_width="150dp"
-        android:layout_height="50dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="110dp"
+        app:layout_constraintDimensionRatio="9:2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvOR"

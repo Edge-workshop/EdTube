@@ -54,7 +54,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        android:src="@drawable/profile_pic_na"
+                        tools:src="@drawable/profile_pic_na"
                         android:scaleType="centerCrop"
                         android:contentDescription="@string/profile_icon" />
 
@@ -125,7 +125,7 @@
         android:id="@+id/tvPlaylistTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="EDGE'S PLAYLIST"
+        tools:text="EDGE'S PLAYLIST"
         android:textColor="@color/white"
         android:textSize="28dp"
         android:textStyle="bold"
@@ -137,12 +137,12 @@
         android:id="@+id/tvNbrOfVideo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Number of video: 5"
+        tools:text="Number of video: 5"
         android:textColor="@color/secondaryTextColor"
         android:textSize="17sp"
         app:layout_constraintStart_toStartOf="@+id/tvPlaylistTitle"
         app:layout_constraintTop_toBottomOf="@+id/tvPlaylistTitle"
-        android:layout_marginTop="@dimen/dimens_4"/>
+        />
 
     <ImageButton
         android:id="@+id/ibPlayBtn"
@@ -162,6 +162,7 @@
         android:id="@+id/ivSelectedThumbnail"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:scaleType="centerCrop"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/glTopThumbnail"
@@ -206,6 +207,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".6"/>
+        app:layout_constraintGuide_percent="0.55" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

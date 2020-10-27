@@ -15,7 +15,7 @@
 
 
     <!--P-->
-    <dimen name="playlist_cell_main_title">16sp</dimen>
+    <dimen name="playlist_cell_main_title">15sp</dimen>
     <dimen name="playlist_text_margin">8dp</dimen>
     <dimen name="playlist_sec_text_size">13sp</dimen>
 
