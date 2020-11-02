@@ -13,9 +13,9 @@ import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.server.Config
 import dev.kingkongcode.edtube.util.HideSystemUi
 
-class VideoViewActivity : YouTubeBaseActivity() {
-    private val TAG = "VideoViewActivity"
+private const val TAG = "VideoViewActivity"
 
+class VideoViewActivity : YouTubeBaseActivity() {
     private lateinit var btnBack: ImageButton
 
     private lateinit var ytYoutubePlayer: YouTubePlayerView
@@ -23,12 +23,10 @@ class VideoViewActivity : YouTubeBaseActivity() {
     private var youtubeVideoID: String? = null
     private var allVideoIDStr: ArrayList<String>? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_view)
         Log.i(TAG,"onCreate is called")
-
         //Code section Full screen
         HideSystemUi.hideSystemUi(this)
 
@@ -58,8 +56,11 @@ class VideoViewActivity : YouTubeBaseActivity() {
         Log.i(TAG, "Function initiate is called")
 
         val playbackEventListener = object: YouTubePlayer.PlaybackEventListener {
-            override fun onSeekTo(p0: Int) {}
-            override fun onBuffering(p0: Boolean) {}
+            override fun onSeekTo(p0: Int) {
+            }
+
+            override fun onBuffering(p0: Boolean) {
+            }
 
             override fun onPlaying() { Log.i(TAG,"Good, video is playing ok") }
 
@@ -71,18 +72,20 @@ class VideoViewActivity : YouTubeBaseActivity() {
         val playerStateChangeListener = object: YouTubePlayer.PlayerStateChangeListener {
             override fun onAdStarted() { Log.i(TAG,"Click Ad now, make the video creator rich!") }
 
-            override fun onLoading() {}
+            override fun onLoading() {
+            }
 
             override fun onVideoStarted() { Log.i(TAG,"Video has started") }
 
-            override fun onLoaded(p0: String?) {}
+            override fun onLoaded(p0: String?) {
+            }
 
             override fun onVideoEnded() { Log.i(TAG,"Congratulations! You've completed another video.") }
 
             override fun onError(p0: YouTubePlayer.ErrorReason?) { Log.i(TAG,"error") }
         }
 
-        onInitializedListener =  object : YouTubePlayer.OnInitializedListener{
+        onInitializedListener =  object : YouTubePlayer.OnInitializedListener {
             override fun onInitializationSuccess(
                 p0: YouTubePlayer.Provider?,
                 youtubePlayer: YouTubePlayer?,
@@ -93,6 +96,7 @@ class VideoViewActivity : YouTubeBaseActivity() {
                     allVideoIDStr = arrayListOf()
                     allVideoIDStr!!.add(youtubeVideoID!!)
                 }
+
                 youtubePlayer?.cueVideos(allVideoIDStr)
                 youtubePlayer?.setPlayerStateChangeListener(playerStateChangeListener)
                 youtubePlayer?.setPlaybackEventListener(playbackEventListener)
@@ -111,5 +115,4 @@ class VideoViewActivity : YouTubeBaseActivity() {
         }
         ytYoutubePlayer.initialize(Config.current.API_KEY, onInitializedListener)
     }
-
 }

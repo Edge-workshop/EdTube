@@ -4,8 +4,7 @@ import android.app.Activity
 import android.view.View
 
 class HideSystemUi {
-
-    companion object{
+    companion object {
         // Enables regular immersive mode.
         // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
         // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY

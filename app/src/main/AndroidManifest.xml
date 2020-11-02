@@ -20,11 +20,11 @@
         <activity android:name=".controller.VideoViewActivity"
             android:configChanges="orientation"
             />
-        <activity android:name=".controller.SelectedPListDetails"
+        <activity android:name=".controller.SelectedPListDetailsActivity"
             android:screenOrientation="portrait"
             />
         <activity
-            android:name=".controller.HomePage"
+            android:name=".controller.HomePageActivity"
             android:theme="@style/AppThemeWithNoTopBar"
             android:screenOrientation="portrait"
             />

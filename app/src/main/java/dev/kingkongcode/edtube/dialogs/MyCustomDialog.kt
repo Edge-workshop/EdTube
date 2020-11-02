@@ -48,11 +48,9 @@ class MyCustomDialog(private val user: ETUser, private val activity: Activity) :
         viewHolder.tvemail.text = user.email
 
         viewHolder.btnOk.setOnClickListener {
-//            HideSystemUi.hideSystemUi(this.activity)
             dismiss()
         }
 
         return convertView
     }
-
 }

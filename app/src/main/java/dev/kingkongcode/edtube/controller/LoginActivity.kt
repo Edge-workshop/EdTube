@@ -7,7 +7,6 @@ import android.transition.Fade
 import android.util.Log
 import android.view.View
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
@@ -22,11 +21,13 @@ import com.google.android.gms.tasks.Task
 import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.server.APIManager
 import dev.kingkongcode.edtube.server.Config
+import dev.kingkongcode.edtube.util.BaseActivity
 
+private const val TAG = "LoginActivity"
+private const val RC_SIGN_IN = 0
+private const val RC_GET_TOKEN = 90
 
-class LoginActivity : AppCompatActivity() {
-
-    private val TAG = "LoginActivity"
+class LoginActivity : BaseActivity() {
     private lateinit var xMainView: ConstraintLayout
 
     private lateinit var progressBar: ProgressBar
@@ -34,13 +35,10 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var etUsername: EditText
     private lateinit var etPassword: EditText
-    private lateinit var googleSignInBtn : SignInButton
+    private lateinit var googleSignInBtn: SignInButton
     private lateinit var tvOR: TextView
     private lateinit var mGoogleSignInClient : GoogleSignInClient
     private lateinit var regSignInButton: Button
-
-    private val RC_SIGN_IN = 0
-    private val RC_GET_TOKEN = 90
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +61,6 @@ class LoginActivity : AppCompatActivity() {
 
         //Google SignIn button
         googleSignInBtn = findViewById(R.id.signInBtn)
-
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestScopes(Scope(Config.current.YOUTUBE_AUTH_READONLY))
             .requestScopes(Scope(Config.current.YOUTUBE_AUTH_UPLOAD))
@@ -71,7 +68,6 @@ class LoginActivity : AppCompatActivity() {
             .requestServerAuthCode(Config.current.CLIENT_ID)
             .requestEmail()
             .build()
-
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
         // ...
         // Build a GoogleApiClient with access to the Google Sign-In API and the
@@ -85,8 +81,8 @@ class LoginActivity : AppCompatActivity() {
         }
 
         initiate()
-
     }
+
     override fun onStart() {
         super.onStart()
         showElementOnScreen()
@@ -98,11 +94,9 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
     }
 
     private fun initiate() {
-
         regSignInButton.setOnClickListener {
 //            val intent = Intent(this@LoginActivity, HomePage::class.java)
 //            startActivity(intent)
@@ -117,10 +111,7 @@ class LoginActivity : AppCompatActivity() {
             progressBar.visibility = View.VISIBLE
             signIn()
         }
-
     }
-
-
 
     private fun getIdToken() {
         // Show an account picker to let the user choose a Google account from the device.
@@ -149,10 +140,10 @@ class LoginActivity : AppCompatActivity() {
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
 
+    //TODO  to put a dialog box protection when user is trying to log in without internet connection
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.i(TAG, "onActivityResult requestCode= $requestCode and resultCode= $resultCode")
-
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             // The Task returned from this call is always completed, no need to attach
@@ -163,12 +154,10 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
-
         try {
             val account = completedTask.getResult(ApiException::class.java)
             val idToken = account?.idToken
             val deviceCode = account?.serverAuthCode
-
             // Signed in successfully, show authenticated UI.
             APIManager.instance.requestAccessToken(
                 this,
@@ -187,22 +176,18 @@ class LoginActivity : AppCompatActivity() {
                         TAG,
                         "Google access request is completed and successfull going to HomePage activity"
                     )
-
 //                    val intent = Intent(this@LoginActivity, HomePage::class.java)
 //                    progressBar.visibility = View.INVISIBLE
 //                    startActivity(intent)
 
                     progressBar.visibility = View.INVISIBLE
                     showImageTransition(xMainView, tvTitle)
-
                 })
-
         } catch (e: ApiException) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w(TAG, "signInResult:failed code=" + e.statusCode)
         }
-
     }
 
     private fun signOut() {
@@ -213,7 +198,7 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
-    private fun showImageTransition(view: View, text: TextView){
+    private fun showImageTransition(view: View, text: TextView) {
         //setup element for view transition
         val text = view.findViewById<TextView>(R.id.tvTitle)
         val imagePair = androidx.core.util.Pair.create(text as View, "appTitle")
@@ -229,17 +214,14 @@ class LoginActivity : AppCompatActivity() {
                 this@LoginActivity,
                 imagePair
             )
-            val intent = Intent(this@LoginActivity, HomePage::class.java)
+            val intent = Intent(this@LoginActivity, HomePageActivity::class.java)
             ActivityCompat.startActivity(this@LoginActivity, intent, option.toBundle())
         } else {
             // Swap without transition
         }
-
-
     }
 
-
-    fun showElementOnScreen(){
+    fun showElementOnScreen() {
         etUsername.visibility = View.VISIBLE
         etPassword.visibility = View.VISIBLE
         tvOR.visibility = View.VISIBLE
@@ -247,16 +229,13 @@ class LoginActivity : AppCompatActivity() {
         googleSignInBtn.visibility = View.VISIBLE
     }
 
-    fun hideElementOnScreen(){
+    fun hideElementOnScreen() {
         etUsername.visibility = View.INVISIBLE
         etPassword.visibility = View.INVISIBLE
         tvOR.visibility = View.INVISIBLE
         regSignInButton.visibility = View.INVISIBLE
         googleSignInBtn.visibility = View.INVISIBLE
     }
-
-
-
 }
 
 

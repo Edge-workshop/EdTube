@@ -16,7 +16,6 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class APIManager {
-
     private lateinit var ctx: Context
     private val sharedPrefFile = "keystoragesaved"
     private var accessToken = Constants.instance.EMPTY_STRING
@@ -40,12 +39,10 @@ class APIManager {
         return headers
     }
 
-
     fun requestAccessToken(context: Context, idToken: String?, deviceCode: String?, completion: (error: String?) -> Unit) {
         this.ctx = context.applicationContext
         val url = Constants.instance.GOOGLE_AUTH2
         Log.i("OAuth api accessToken",url)
-
         val queue = Volley.newRequestQueue(ctx)
 
         val bodyJSON = JSONObject()
@@ -60,7 +57,6 @@ class APIManager {
             Method.POST, url, bodyJSON,
             Response.Listener { response ->
                 if (response != null) {
-
                     this.accessToken = response.optString("access_token")
 
                     val sharedPreferences: SharedPreferences = this.ctx.getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
@@ -72,7 +68,6 @@ class APIManager {
                     editor.putString("token_type",response.optString("token_type"))
                     editor.apply()
                     editor.commit()
-
                     completion(null)
                 } else {
                     completion(R.string.general_unexpected_error.toString())
@@ -92,13 +87,10 @@ class APIManager {
         queue.add(request)
     }
 
-
     fun requestUserPlaylist(context: Context, completion: (error: String?, userPlaylist: PlaylistCategory?) -> Unit) {
         this.ctx = context.applicationContext
         val sharedPreferences = ctx.getSharedPreferences("keystoragesaved", Context.MODE_PRIVATE)
-
         val url = Constants.instance.YOUTUBE_BASE_URL+"/playlists?part=snippet%2CcontentDetails&maxResults=25&mine=true&access_token=${sharedPreferences.getString("access_token", "")}"
-
         Log.i("Req to obtain playlist",url)
         val queue = Volley.newRequestQueue(ctx)
 
@@ -108,7 +100,6 @@ class APIManager {
             Response.Listener { response ->
                 if (response != null) {
                     val userPlaylistRecv = PlaylistCategory(response)
-
                     completion(null, userPlaylistRecv)
                 } else {
                     completion(R.string.general_unexpected_error.toString(), null)
@@ -128,32 +119,29 @@ class APIManager {
         queue.add(request)
     }
 
-
     fun requestSelectedPlaylistDetails (context: Context, pListID: String,  nextPageToken: String?, completion: (error: String?, selectedPList: ArrayList<PlaylistItemActivity>?) -> Unit) {
         this.ctx = context.applicationContext
         val sharedPreferences = ctx.getSharedPreferences("keystoragesaved", Context.MODE_PRIVATE)
-
         var url = Constants.instance.YOUTUBE_BASE_URL+"/playlistItems?part=contentDetails&part=id&part=snippet&part=status&playlistId=${pListID}&access_token=${sharedPreferences.getString("access_token", "")}"
-        nextPageToken?.let { url += "&pageToken=$nextPageToken" }
-
         Log.i("Req selected playlist",url)
         val queue = Volley.newRequestQueue(ctx)
 
-        val bodyJSON = JSONObject()
+        nextPageToken?.let { url += "&pageToken=$nextPageToken" }
 
+        val bodyJSON = JSONObject()
         val request = object : JsonObjectRequest(
             Method.GET, url, bodyJSON,
             Response.Listener { response ->
                 if (response != null) {
                     val responseRecv =  PlaylistCategory(response)
-                    for (video in responseRecv.items){
+                    for (video in responseRecv.items) {
                         userSelectedListRecv.add(video)
                     }
 
                     //Code section to check if there is another page in the result to fetch before sending back to Activity
-                    if (!responseRecv.nextPageToken.isNullOrEmpty()){
+                    if (!responseRecv.nextPageToken.isNullOrEmpty()) {
                         requestSelectedPlaylistDetails(context, pListID, responseRecv.nextPageToken, completion)
-                    }else {
+                    } else {
                         completion(null, userSelectedListRecv)
                         userSelectedListRecv.clear()
                     }
@@ -175,12 +163,10 @@ class APIManager {
         queue.add(request)
     }
 
-
     fun requestSearchVideo (context: Context, requestWord: String,  completion: (error: String?, searchResultList: ArrayList<PlaylistItemActivity>?) -> Unit) {
         this.ctx = context.applicationContext
         val sharedPreferences = ctx.getSharedPreferences("keystoragesaved", Context.MODE_PRIVATE)
         val url = Constants.instance.YOUTUBE_BASE_URL+"/search?part=snippet&maxResults=25&q=$requestWord&videoDuration=any&access_token=${sharedPreferences.getString("access_token", "")}"
-
         Log.i("Req SearchVideo",url)
         val queue = Volley.newRequestQueue(ctx)
 
@@ -189,7 +175,7 @@ class APIManager {
             Method.GET, url, bodyJSON,
             Response.Listener { response ->
                 if (response != null) {
-                    val responseRecv =  PlaylistCategory(response)
+                    val responseRecv = PlaylistCategory(response)
                     var userSelectedListRecv = arrayListOf<PlaylistItemActivity>()
 
                     for (video in responseRecv.items){
@@ -200,7 +186,6 @@ class APIManager {
                 } else {
                     completion(R.string.general_unexpected_error.toString(), null)
                 }
-
             },
             Response.ErrorListener { error ->
                 completion(error.toString(), null)
@@ -215,5 +200,4 @@ class APIManager {
         }
         queue.add(request)
     }
-
 }

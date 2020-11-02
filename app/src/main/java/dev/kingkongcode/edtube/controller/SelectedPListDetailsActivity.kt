@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,11 +22,12 @@ import dev.kingkongcode.edtube.model.ETUser
 import dev.kingkongcode.edtube.dialogs.MyCustomDialog
 import dev.kingkongcode.edtube.model.PlaylistItemActivity
 import dev.kingkongcode.edtube.server.APIManager
+import dev.kingkongcode.edtube.util.BaseActivity
 import java.util.*
 
-class SelectedPListDetails : AppCompatActivity() {
+private const val TAG = "SelectedPListDetails"
 
-    private val TAG = "SelectedPListDetails"
+class SelectedPListDetailsActivity : BaseActivity() {
     private lateinit var progressBar: ProgressBar
 
     private lateinit var mGoogleSignInClient : GoogleSignInClient
@@ -44,18 +44,14 @@ class SelectedPListDetails : AppCompatActivity() {
     private lateinit var rvListVideo: RecyclerView
     private lateinit var linearLayoutManager: LinearLayoutManager
     private var mPlayList = arrayListOf<PlaylistItemActivity>()
-    private lateinit var playlistAdapter: SelectedPListDetails.PlaylistAdapter
+    private lateinit var playlistAdapter: SelectedPListDetailsActivity.PlaylistAdapter
 
     private lateinit var bottomNavigation: BottomNavigationView
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_selected_p_list_details)
         Log.i(TAG,"onCreate is called")
-
-        //Code full screen
-//        HideSystemUi.hideSystemUi(this)
 
         //Progressbar
         progressBar = findViewById(R.id.progressBar)
@@ -87,11 +83,10 @@ class SelectedPListDetails : AppCompatActivity() {
 
     private fun initiate() {
         Log.i(TAG,"Function initiate is called")
-
         progressBar.visibility = View.VISIBLE
 
         //Code section initiate RecycleView and PlaylistAdapter
-        playlistAdapter = PlaylistAdapter(this@SelectedPListDetails, this.mPlayList)
+        playlistAdapter = PlaylistAdapter(this@SelectedPListDetailsActivity, this.mPlayList)
         rvListVideo.adapter = playlistAdapter
 
         var videoNbr: String
@@ -100,7 +95,7 @@ class SelectedPListDetails : AppCompatActivity() {
             //Getting user info
             etUser = extras.getParcelable<ETUser>("ETUser")!!
             //Code to display the right String in user lang
-            val completeStringTitle = if (Locale.getDefault().isO3Language == "eng"){
+            val completeStringTitle = if (Locale.getDefault().isO3Language == "eng") {
                 "${etUser.firstName}' s Playlist."
             } else "La Playlist à ${etUser.firstName}."
             tvPlaylistTitle.text = completeStringTitle
@@ -112,7 +107,7 @@ class SelectedPListDetails : AppCompatActivity() {
 
             ivProfilePic.setOnClickListener {
                 Log.i(TAG,"User click on profil icon custom dialog show")
-                MyCustomDialog(etUser,this@SelectedPListDetails).show(supportFragmentManager,"MyCustomFragment")
+                MyCustomDialog(etUser,this@SelectedPListDetailsActivity).show(supportFragmentManager,"MyCustomFragment")
             }
 
             //Retrieving user selected list id
@@ -124,40 +119,40 @@ class SelectedPListDetails : AppCompatActivity() {
 
         //Code section when user click into main thumbnail image
         ivSelectedThumbnail.setOnClickListener {
-            val intent = Intent(this@SelectedPListDetails,VideoViewActivity::class.java)
+            val intent = Intent(this@SelectedPListDetailsActivity,VideoViewActivity::class.java)
             intent.putExtra("youtubeVideoID",youtubeVideoID)
             startActivity(intent)
         }
 
         ibPlayAllBtn.setOnClickListener {
             val allVideoId = arrayListOf<String>()
-
             for (videoId in this.mPlayList){
                 allVideoId.add(videoId.snippet.ressourceId.videoId)
             }
 
-            val intent = Intent(this@SelectedPListDetails,VideoViewActivity::class.java)
+            val intent = Intent(this@SelectedPListDetailsActivity,VideoViewActivity::class.java)
             intent.putExtra("playAll",allVideoId)
             startActivity(intent)
         }
 
-
         //Code section for Bottom Navigation menu item
         bottomNavigation.setOnNavigationItemSelectedListener {
-            when(it.itemId){
+            when(it.itemId) {
                 R.id.home_page_menu_home -> {
-                    val intent = Intent(this@SelectedPListDetails,HomePage::class.java)
+                    val intent = Intent(this@SelectedPListDetailsActivity,HomePageActivity::class.java)
                     startActivity(intent)
                     finish()
                     true
                 }
+
                 R.id.home_page_menu_search -> {
-                    val intent = Intent(this@SelectedPListDetails,SearchVideoActivity::class.java)
+                    val intent = Intent(this@SelectedPListDetailsActivity,SearchVideoActivity::class.java)
                     intent.putExtra("ETUser",etUser)
                     startActivity(intent)
                     finish()
                     true
                 }
+
                 R.id.home_page_menu_log_out -> {
                     showLogOutDialog()
                     true
@@ -165,16 +160,15 @@ class SelectedPListDetails : AppCompatActivity() {
                 else -> false
             }
         }
-
     }
 
-    private fun requestSelectedPList(selectedID: String){
+    private fun requestSelectedPList(selectedID: String) {
         Log.i(TAG,"Function requestSelectedPList was called")
 
-        APIManager.instance.requestSelectedPlaylistDetails(this@SelectedPListDetails,selectedID, null, completion = { error, selectedPList ->
+        APIManager.instance.requestSelectedPlaylistDetails(this@SelectedPListDetailsActivity,selectedID, null, completion = { error, selectedPList ->
             Log.i(TAG,"APIManager requestSelectedPlaylistDetails response receive in activity")
 
-            error?.let { Toast.makeText(this@SelectedPListDetails,error,Toast.LENGTH_SHORT).show() }
+            error?.let { Toast.makeText(this@SelectedPListDetailsActivity,error,Toast.LENGTH_SHORT).show() }
 
             //Code section where we populate adapter with api response data
             selectedPList?.let {
@@ -190,13 +184,11 @@ class SelectedPListDetails : AppCompatActivity() {
             }
             progressBar.visibility = View.INVISIBLE
         })
-
     }
 
-    private fun showLogOutDialog(){
+    private fun showLogOutDialog() {
         // build alert dialog
         val dialogBuilder = AlertDialog.Builder(this)
-
         // set message of alert dialog
         dialogBuilder.setMessage("Do you want to close this application ?")
             // if the dialog is cancelable
@@ -228,9 +220,7 @@ class SelectedPListDetails : AppCompatActivity() {
             }
     }
 
-
-    private inner class PlaylistAdapter(private val mContext: Context, private var dataSet: List<PlaylistItemActivity>) : RecyclerView.Adapter<SelectedPListDetails.PlaylistAdapter.VideoViewHolder>(), View.OnClickListener {
-
+    private inner class PlaylistAdapter(private val mContext: Context, private var dataSet: List<PlaylistItemActivity>) : RecyclerView.Adapter<SelectedPListDetailsActivity.PlaylistAdapter.VideoViewHolder>(), View.OnClickListener {
         private var oldIndexSelected = 0
         private var isJustStarted = true
 
@@ -244,14 +234,14 @@ class SelectedPListDetails : AppCompatActivity() {
                 tvTrackTitle.text = video.snippet.title
                 tvDuration.text = "N/A"
             }
-
         }
 
         @Override
-        override fun onClick(v: View) {}
+        override fun onClick(v: View) {
+        }
 
         @Override
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistAdapter.VideoViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) : PlaylistAdapter.VideoViewHolder {
             val layout =  R.layout.video_details_row
             val view = LayoutInflater.from(mContext).inflate(layout, parent, false)
             return VideoViewHolder(view)
@@ -265,7 +255,7 @@ class SelectedPListDetails : AppCompatActivity() {
         @Override
         override fun onBindViewHolder(holder: VideoViewHolder, position: Int) {
             //Code section to highlight first row on first creation
-            if (isJustStarted){
+            if (isJustStarted) {
                 dataSet[0].isVideoSelected = true
                 isJustStarted = false
             }
@@ -274,15 +264,15 @@ class SelectedPListDetails : AppCompatActivity() {
             holder.bind(video, position)
 
             //Code section show user what was selected in RecycleView playlist
-            if (video.isVideoSelected){
-                holder.tvTrackTitle.setTextColor(ContextCompat.getColor(this@SelectedPListDetails,R.color.greenLetter))
-            }else holder.tvTrackTitle.setTextColor(ContextCompat.getColor(this@SelectedPListDetails,R.color.white))
+            if (video.isVideoSelected) {
+                holder.tvTrackTitle.setTextColor(ContextCompat.getColor(this@SelectedPListDetailsActivity,R.color.greenLetter))
+            } else holder.tvTrackTitle.setTextColor(ContextCompat.getColor(this@SelectedPListDetailsActivity,R.color.white))
 
             holder.itemView.setOnClickListener {
                 Log.i(TAG,"User click on specific playlist title: ${video.snippet.title} row position: $position")
 
                 //Code section to send image thumbnails to main view when user click on specific row
-                if (!video.snippet.thumbnails.high.url.isNullOrEmpty()){
+                if (!video.snippet.thumbnails.high.url.isNullOrEmpty()) {
                     Glide.with(mContext).load(video.snippet.thumbnails.high.url).into(ivSelectedThumbnail)
                     youtubeVideoID = video.snippet.ressourceId.videoId
                 }
@@ -295,5 +285,4 @@ class SelectedPListDetails : AppCompatActivity() {
             }
         }
     }
-
 }

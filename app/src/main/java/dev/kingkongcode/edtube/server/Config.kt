@@ -1,17 +1,14 @@
 package dev.kingkongcode.edtube.server
 
 class Config {
-
     companion object{
         val current = Config()
     }
 
-
     val CLIENT_ID = ""
     val CLIENT_SECRET = ""
     val API_KEY = ""
-
-    val OAUTH2_URL = "https://www.googleapis.com/oauth2/v4/token"
+    val OAUTH2_URL = ""
 
     /**
      * Youtube
@@ -22,5 +19,4 @@ class Config {
     val YOUTUBE_PLAYLIST_ITEMS_VIDEO_REQ = "https://www.googleapis.com/youtube/v3/videos"
     val YOUTUBE_AUTH_READONLY = "https://www.googleapis.com/auth/youtube.readonly"
     val YOUTUBE_AUTH_UPLOAD = "https://www.googleapis.com/auth/youtube.upload"
-
 }

@@ -8,13 +8,15 @@ import android.view.animation.AnimationUtils
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import dev.kingkongcode.edtube.R
+import dev.kingkongcode.edtube.util.BaseActivity
 
-class MainActivity : AppCompatActivity() {
+private const val TAG = "MainActivity"
+
+class MainActivity : BaseActivity() {
     /***
      * SplashScreen Activity
      * */
 
-    private val TAG = "MainActivity"
     private lateinit var tvTitle: TextView
 
     private lateinit var countDownTimer: CountDownTimer
@@ -25,16 +27,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Log.i(TAG, "onCreate is called")
-
         //App Title
         tvTitle = findViewById(R.id.tvTitle)
+
         /** scale animtion on title **/
         val scale = AnimationUtils.loadAnimation(this, R.anim.scale_up)
         tvTitle.startAnimation(scale)
 
         //Code section to start timer to go automatically in Login page
-        countDownTimer = object : CountDownTimer(initialCountDownTime, countDownInterval){
-            override fun onTick(p0: Long) {}
+        countDownTimer = object : CountDownTimer(initialCountDownTime, countDownInterval) {
+            override fun onTick(p0: Long) {
+            }
+
             override fun onFinish() {
                 Log.i(TAG, "CountDownTimer onFinish is called, going to LoginActivity")
                 val intent = Intent(this@MainActivity, LoginActivity::class.java)
@@ -43,7 +47,7 @@ class MainActivity : AppCompatActivity() {
                 finish()
             }
         }
+
         countDownTimer.start()
     }
-
 }

@@ -1,26 +1,21 @@
-package dev.kingkongcode.edtube.util
+package dev.kingkongcode.edtube.util.network
 
 import android.app.Dialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.location.LocationManager
 import android.net.ConnectivityManager
-import android.widget.Toast
 import dev.kingkongcode.edtube.R
 
-class NetworkStateConnection: BroadcastReceiver() {
-
+open class NetworkStateConnection : BroadcastReceiver() {
     private val TAG = "NetworkStateConnection"
-
     private var ourInstance: NetworkStateConnection? = null
     private var isConnected = false
     private var connectActStr: String = ""
     private var connectMobStr: String = ""
     private var dialog: Dialog? = null
 
-
-    fun getConnectActStr(): String? {
+    fun getConnectActStr() : String? {
         return connectActStr
     }
 
@@ -28,7 +23,7 @@ class NetworkStateConnection: BroadcastReceiver() {
         this.connectActStr = connectActStr
     }
 
-    fun getConnectMobStr(): String? {
+    fun getConnectMobStr() : String? {
         return connectMobStr
     }
 
@@ -36,7 +31,7 @@ class NetworkStateConnection: BroadcastReceiver() {
         this.connectMobStr = connectMobStr
     }
 
-    fun isConnected(): Boolean {
+    fun isConnected() : Boolean {
         return isConnected
     }
 
@@ -44,22 +39,22 @@ class NetworkStateConnection: BroadcastReceiver() {
         isConnected = connected
     }
 
-    fun getInstance(): NetworkStateConnection? {
+    fun getInstance() : NetworkStateConnection? {
         return ourInstance
     }
 
-    fun NetworkStateConnection(context: Context?) {
+    fun NetworkStateConnection(context: Context?) : NetworkStateConnection {
         dialog = Dialog(context!!)
         dialog!!.setContentView(R.layout.no_internet_connection_msg_error)
         dialog!!.setTitle("Connection Lost")
         dialog!!.setCancelable(false)
+        return this
     }
-//TODO finish network connection
 
-//    fun getOurInstance(context: Context?): NetworkStateConnection? {
-//        if (ourInstance == null) ourInstance = NetworkStateConnection(context)
-//        return ourInstance
-//    }
+    fun getOurInstance(context: Context?) : NetworkStateConnection? {
+        if (ourInstance == null) ourInstance =  NetworkStateConnection(context)
+        return ourInstance
+    }
 
     override fun onReceive(context: Context, intent: Intent) {
         if (ConnectivityManager.CONNECTIVITY_ACTION == intent.action) {
@@ -74,15 +69,14 @@ class NetworkStateConnection: BroadcastReceiver() {
                 if (dialog != null && dialog!!.isShowing) dialog!!.dismiss()
             }
         }
-        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            //when gps is on
-        } else {
-            //when gps is off
-            Toast.makeText(context, "Please switch on the GPS", Toast.LENGTH_LONG).show()
 
-        }
+//        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+//        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+//            //when gps is on
+//        } else {
+//            //when gps is off
+//            Toast.makeText(context, "Please switch on the GPS", Toast.LENGTH_LONG).show()
+//
+//        }
     }
-
-
 }

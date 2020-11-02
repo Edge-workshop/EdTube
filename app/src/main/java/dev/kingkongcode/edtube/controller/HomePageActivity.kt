@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -23,15 +22,17 @@ import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.model.ETUser
 import dev.kingkongcode.edtube.dialogs.MyCustomDialog
 import dev.kingkongcode.edtube.server.APIManager
+import dev.kingkongcode.edtube.util.BaseActivity
 import dev.kingkongcode.edtube.util.PaginationList
 import java.util.*
 
-class HomePage : AppCompatActivity() {
+private const val TAG = "HomePage"
+private const val RC_SIGN_IN = 0
 
-    private val TAG = "HomePage"
+class HomePageActivity : BaseActivity() {
     private lateinit var accessToken: String
     private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var mGoogleSignInClient : GoogleSignInClient
+    private lateinit var mGoogleSignInClient: GoogleSignInClient
     private lateinit var progressBar: ProgressBar
 
     private lateinit var layoutHomePageView: ConstraintLayout
@@ -52,11 +53,6 @@ class HomePage : AppCompatActivity() {
     private lateinit var bottomNav: BottomNavigationView
 
     private lateinit var etUser: ETUser
-
-    companion object {
-        const val RC_SIGN_IN = 0
-    }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,16 +91,16 @@ class HomePage : AppCompatActivity() {
     private fun initiate() {
         Log.i(TAG,"Function initiate is called")
         progressBar.visibility = View.VISIBLE
-
         val acct = GoogleSignIn.getLastSignedInAccount(this)
+
         if (acct != null) {
             //Creating user
             etUser = ETUser(acct.givenName,acct.familyName,acct.email,acct.photoUrl)
-
             //Code to display the right String in user lang
-            val completeStringTitle = if (Locale.getDefault().isO3Language == "eng"){
+            val completeStringTitle = if (Locale.getDefault().isO3Language == "eng") {
                 "${etUser.firstName}' s Playlist."
             } else "La Playlist à ${etUser.firstName}."
+
             tvUsernameTitle.text = completeStringTitle
 
             //Code to retreive profile pic from google sign in or else default pic
@@ -114,7 +110,7 @@ class HomePage : AppCompatActivity() {
 
             ivProfilePic.setOnClickListener {
                 Log.i(TAG,"User click on profil icon custom dialog show")
-                MyCustomDialog(etUser,this@HomePage).show(supportFragmentManager,"MyCustomFragment")
+                MyCustomDialog(etUser,this@HomePageActivity).show(supportFragmentManager,"MyCustomFragment")
             }
         }
 
@@ -122,53 +118,57 @@ class HomePage : AppCompatActivity() {
 
         //Code section for Previous page with pagination function
         prevPageArrow.setOnClickListener {
-            if (currentPage > 1){
+            if (currentPage > 1) {
                 currentPage -= 1
-
+                //Code section to display user current page and max page
                 val (a, b) = PaginationList.showNbrPage(userPList, currentPage)
                 pageNbr.text = a
                 maxPage = b
-
+                //Code section to select right items on the list
                 val filterUserList = PaginationList.filterPage(userPList, currentPage)
                 playlistAdapter.clear()
-                for (itemList in filterUserList){
+                for (itemList in filterUserList) {
                     playlistAdapter.add(itemList)
                 }
+
                 playlistAdapter.notifyDataSetChanged()
             }
         }
 
         //Code section for Next page with pagination function
         nextPageArrow.setOnClickListener {
-            if (currentPage < maxPage){
+            if (currentPage < maxPage) {
                 currentPage += 1
-
+                //Code section to display user current page and max page
                 val (a, b) = PaginationList.showNbrPage(userPList, currentPage)
                 pageNbr.text = a
                 maxPage = b
-
+                //Code section to display user current page and max page
                 val filterUserList = PaginationList.filterPage(userPList, currentPage)
                 playlistAdapter.clear()
                 for (itemList in filterUserList){
                     playlistAdapter.add(itemList)
                 }
+
                 playlistAdapter.notifyDataSetChanged()
             }
         }
 
         //Code section for Bottom Navigation menu item
         bottomNav.setOnNavigationItemSelectedListener {
-            when(it.itemId){
+            when(it.itemId) {
                 R.id.home_page_menu_home -> {
                     true
                 }
+
                 R.id.home_page_menu_search -> {
-                    val intent = Intent(this@HomePage,SearchVideoActivity::class.java)
+                    val intent = Intent(this@HomePageActivity,SearchVideoActivity::class.java)
                     intent.putExtra("ETUser",etUser)
                     startActivity(intent)
                     finish()
                     true
                 }
+
                 R.id.home_page_menu_log_out -> {
                     showLogOutDialog()
                     true
@@ -176,9 +176,7 @@ class HomePage : AppCompatActivity() {
                 else -> false
             }
         }
-
     }
-
 
     /***
      * Top menu
@@ -202,14 +200,13 @@ class HomePage : AppCompatActivity() {
         return super.onPrepareOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean{
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return true
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.i(TAG, "onActivityResult requestCode= $requestCode and resultCode= $resultCode")
-
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             // The Task returned from this call is always completed, no need to attach
@@ -236,7 +233,6 @@ class HomePage : AppCompatActivity() {
     private fun showLogOutDialog(){
         // build alert dialog
         val dialogBuilder = AlertDialog.Builder(this)
-
         // set message of alert dialog
         dialogBuilder.setMessage("Do you want to close this application ?")
             // if the dialog is cancelable
@@ -261,7 +257,6 @@ class HomePage : AppCompatActivity() {
 
     private fun signOut() {
         Log.i(TAG,"Function signOut is called")
-
         mGoogleSignInClient.signOut()
             .addOnCompleteListener(this) {
                 Toast.makeText(this, getString(R.string.signOut_succes), Toast.LENGTH_LONG).show()
@@ -269,28 +264,26 @@ class HomePage : AppCompatActivity() {
             }
     }
 
-    private fun reqListApi(){
+    private fun reqListApi() {
         Log.i(TAG,"Request user list to api manager")
         APIManager.instance.requestUserPlaylist(this, completion = { error, userPlaylist ->
             Log.i(TAG,"APIManager requestUserPlaylist response receive in activity")
 
             progressBar?.let { it.visibility = View.INVISIBLE }
 
-            error?.let {Toast.makeText(this@HomePage,error,Toast.LENGTH_SHORT).show() }
+            error?.let { Toast.makeText(this@HomePageActivity,error,Toast.LENGTH_SHORT).show() }
 
             //Code section when we populate GridView adapter
             userPlaylist?.let {
                 userPList = it.items
-
+                //Code section to display user current page and max page
                 val (a, b) = PaginationList.showNbrPage(userPList, currentPage)
                 pageNbr.text = a
                 maxPage = b
 
                 playlistAdapter = PlaylistAdapter(
-                    this, PaginationList.filterPage(
-                        userPList,
-                        currentPage
-                    )
+                    //Code section to display user current page and max page
+                    this, PaginationList.filterPage(userPList, currentPage)
                 )
                 playlistGridView.adapter = playlistAdapter
             }
@@ -305,7 +298,6 @@ class HomePage : AppCompatActivity() {
         R.layout.playlist_cell,
         dataSet
     ), View.OnClickListener {
-
         private inner class ViewHolder {
             lateinit var ivThumbnail: ImageView
             lateinit var tvPlaylistTitle: TextView
@@ -313,11 +305,14 @@ class HomePage : AppCompatActivity() {
         }
 
         @Override
-        override fun onClick(v: View) {}
+        override fun onClick(v: View) {
+        }
+
         @Override
         override fun getItem(position: Int): dev.kingkongcode.edtube.model.PlaylistItemActivity? {
             return super.getItem(position)
         }
+
         @Override
         override fun getPosition(itemActivity: dev.kingkongcode.edtube.model.PlaylistItemActivity?): Int {
             return super.getPosition(itemActivity)
@@ -327,9 +322,9 @@ class HomePage : AppCompatActivity() {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             var convertView = convertView
             val dataModel = getItem(position)
+            val viewHolder: ViewHolder // view lookup cache stored in tag
 
             // Check if an existing view is being reused, otherwise inflate the view
-            val viewHolder: ViewHolder // view lookup cache stored in tag
             if (convertView == null) {
                 viewHolder = ViewHolder()
                 val inflater = LayoutInflater.from(context)
@@ -337,7 +332,6 @@ class HomePage : AppCompatActivity() {
                 viewHolder.ivThumbnail = convertView.findViewById(R.id.ivThumbnail)
                 viewHolder.tvPlaylistTitle = convertView.findViewById(R.id.tvPlaylistTitle)
                 viewHolder.tvNbrOfVideo = convertView.findViewById(R.id.tvNbrOfVideo)
-
                 convertView.tag = viewHolder
             } else {
                 viewHolder = convertView.tag as ViewHolder
@@ -354,18 +348,16 @@ class HomePage : AppCompatActivity() {
                 }
 
                 convertView?.setOnClickListener {
-                    val intent = Intent(this@HomePage,SelectedPListDetails::class.java)
+                    val intent = Intent(this@HomePageActivity,SelectedPListDetailsActivity::class.java)
                     intent.putExtra("selectedListID",dataModel.listId)
                     intent.putExtra("videoNbr",videoNbr)
                     intent.putExtra("ETUser",etUser)
                     startActivity(intent)
                     finish()
                 }
-
             }
+
             return convertView!!
         }
     }
-
-
 }

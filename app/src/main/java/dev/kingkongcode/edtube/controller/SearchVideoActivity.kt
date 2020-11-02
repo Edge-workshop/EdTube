@@ -3,7 +3,6 @@ package dev.kingkongcode.edtube.controller
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -24,10 +23,11 @@ import dev.kingkongcode.edtube.model.ETUser
 import dev.kingkongcode.edtube.dialogs.MyCustomDialog
 import dev.kingkongcode.edtube.model.PlaylistItemActivity
 import dev.kingkongcode.edtube.server.APIManager
+import dev.kingkongcode.edtube.util.BaseActivity
 
-class SearchVideoActivity : AppCompatActivity() {
+private const val TAG = "SearchVideoActivity"
 
-    private val TAG = "SearchVideoActivity"
+class SearchVideoActivity : BaseActivity() {
     private lateinit var main: ConstraintLayout
     private lateinit var progressBar: ProgressBar
 
@@ -54,7 +54,6 @@ class SearchVideoActivity : AppCompatActivity() {
         main = findViewById(R.id.mainView)
         //ProgressBar
         progressBar = findViewById(R.id.progressBar)
-
         //Profil Picture
         ivProfilePic = findViewById(R.id.ivProfileAvatar)
         //SearchBar
@@ -69,7 +68,6 @@ class SearchVideoActivity : AppCompatActivity() {
         bottomNavigation = findViewById(R.id.bottomNavigation)
         bottomNavigation.selectedItemId = R.id.home_page_menu_search
 
-
         //Initialize RecycleView and adapter
         playlistAdapter = VideoListAdapter(this@SearchVideoActivity,this.mSearchResultList)
         rvYTVideoList.adapter = playlistAdapter
@@ -79,8 +77,8 @@ class SearchVideoActivity : AppCompatActivity() {
 
     private fun initiate() {
         Log.i(TAG,"Function initiate is called")
-
         val extras: Bundle? = intent.extras
+
         if (extras != null){
             //Getting user info
             etUser = extras.getParcelable("ETUser")!!
@@ -107,7 +105,7 @@ class SearchVideoActivity : AppCompatActivity() {
         ibConfirmOrDelete.setOnClickListener {
 //            HideSystemUi.hideSystemUi(this)
 
-            if (!etSearchBar.text.isNullOrEmpty() && !isDeleting){
+            if (!etSearchBar.text.isNullOrEmpty() && !isDeleting) {
                 isDeleting = true
                 progressBar.visibility = View.VISIBLE
 //                ibConfirmOrDelete.setImageResource(R.drawable.clear_icon)
@@ -124,15 +122,16 @@ class SearchVideoActivity : AppCompatActivity() {
                                 tempSearchFilter.add(video)
                             }
                         }
+
                         this.mSearchResultList.addAll(tempSearchFilter)
                         this.rvYTVideoList.adapter?.notifyDataSetChanged()
                     }
                 })
+
                 progressBar.visibility = View.INVISIBLE
                 //Code section to automatically hide editText Keyboard
                 main.performClick()
-
-            }else if (!etSearchBar.text.isNullOrEmpty() && isDeleting){
+            }else if (!etSearchBar.text.isNullOrEmpty() && isDeleting) {
                 etSearchBar.text.clear()
                 isDeleting = false
 //                ibConfirmOrDelete.setImageResource(R.drawable.check_icon)
@@ -141,21 +140,22 @@ class SearchVideoActivity : AppCompatActivity() {
                 //Code section to automatically hide editText Keyboard
                 main.performClick()
             } else Toast.makeText(this,getString(R.string.write_search_word),Toast.LENGTH_SHORT).show()
-
         }
 
         //Code section for Bottom Navigation menu item
         bottomNavigation.setOnNavigationItemSelectedListener {
-            when(it.itemId){
+            when(it.itemId) {
                 R.id.home_page_menu_home -> {
-                    val intent = Intent(this@SearchVideoActivity,HomePage::class.java)
+                    val intent = Intent(this@SearchVideoActivity,HomePageActivity::class.java)
                     startActivity(intent)
                     finish()
                     true
                 }
+
                 R.id.home_page_menu_search -> {
                     true
                 }
+
                 R.id.home_page_menu_log_out -> {
                     showLogOutDialog()
                     true
@@ -163,13 +163,11 @@ class SearchVideoActivity : AppCompatActivity() {
                 else -> false
             }
         }
-
     }
 
-    private fun showLogOutDialog(){
+    private fun showLogOutDialog() {
         // build alert dialog
         val dialogBuilder = AlertDialog.Builder(this)
-
         // set message of alert dialog
         dialogBuilder.setMessage("Do you want to close this application ?")
             // if the dialog is cancelable
@@ -219,11 +217,11 @@ class SearchVideoActivity : AppCompatActivity() {
                 tvAuthor.text = video.snippet.title
                 tvDuration.text = "N/A"
             }
-
         }
 
         @Override
-        override fun onClick(v: View) {}
+        override fun onClick(v: View) {
+        }
 
         @Override
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoListAdapter.VideoViewHolder {
@@ -250,8 +248,5 @@ class SearchVideoActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
-
     }
-
-
 }
