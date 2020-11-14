@@ -42,7 +42,7 @@ class HomePageActivity : BaseActivity() {
 
     private lateinit var playlistGridView: GridView
     private lateinit var playlistAdapter: PlaylistAdapter
-    private var userPList = arrayListOf<dev.kingkongcode.edtube.model.PlaylistItemActivity>()
+    private var userPList = arrayListOf<dev.kingkongcode.edtube.model.PlaylistItem>()
 
     private lateinit var pageNbr: TextView
     private var currentPage: Int = 1
@@ -292,8 +292,8 @@ class HomePageActivity : BaseActivity() {
 
 
     inner class PlaylistAdapter(
-        private val mContext: Context, dataSet: List<dev.kingkongcode.edtube.model.PlaylistItemActivity>
-    ) : ArrayAdapter<dev.kingkongcode.edtube.model.PlaylistItemActivity?>(
+        private val mContext: Context, dataSet: List<dev.kingkongcode.edtube.model.PlaylistItem>
+    ) : ArrayAdapter<dev.kingkongcode.edtube.model.PlaylistItem?>(
         mContext,
         R.layout.playlist_cell,
         dataSet
@@ -309,12 +309,12 @@ class HomePageActivity : BaseActivity() {
         }
 
         @Override
-        override fun getItem(position: Int): dev.kingkongcode.edtube.model.PlaylistItemActivity? {
+        override fun getItem(position: Int): dev.kingkongcode.edtube.model.PlaylistItem? {
             return super.getItem(position)
         }
 
         @Override
-        override fun getPosition(itemActivity: dev.kingkongcode.edtube.model.PlaylistItemActivity?): Int {
+        override fun getPosition(itemActivity: dev.kingkongcode.edtube.model.PlaylistItem?): Int {
             return super.getPosition(itemActivity)
         }
 

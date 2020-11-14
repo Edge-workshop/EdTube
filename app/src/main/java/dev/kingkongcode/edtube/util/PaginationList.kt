@@ -1,20 +1,19 @@
 package dev.kingkongcode.edtube.util
 
-import android.content.Context
 import kotlin.math.ceil
 
 class PaginationList {
     companion object{
 
-        fun showNbrPage(listItemActivities: ArrayList<dev.kingkongcode.edtube.model.PlaylistItemActivity>, currentPage: Int) : Pair<String,Int>{
+        fun showNbrPage(listItemActivities: ArrayList<dev.kingkongcode.edtube.model.PlaylistItem>, currentPage: Int) : Pair<String,Int> {
             val totalOfItems = listItemActivities.size
             val nbrOfItemsPerPage = 4.0
             val totalOfPage: Int = ceil(totalOfItems /nbrOfItemsPerPage).toInt()
             return Pair("$currentPage/$totalOfPage",totalOfPage)
         }
 
-        fun filterPage(listItemActivities: ArrayList<dev.kingkongcode.edtube.model.PlaylistItemActivity>, currentPage: Int) : ArrayList<dev.kingkongcode.edtube.model.PlaylistItemActivity>{
-            var filterList = ArrayList<dev.kingkongcode.edtube.model.PlaylistItemActivity>()
+        fun filterPage(listItemActivities: ArrayList<dev.kingkongcode.edtube.model.PlaylistItem>, currentPage: Int) : ArrayList<dev.kingkongcode.edtube.model.PlaylistItem> {
+            var filterList = ArrayList<dev.kingkongcode.edtube.model.PlaylistItem>()
             //val maxIndex = listItems.size - 1
             val nbrOfItemsPerPage = 4.0
 
@@ -24,7 +23,7 @@ class PaginationList {
 
             val firstIndexInPage: Int = (((currentPage * nbrOfItemsPerPage)-1) - nbrOfItemsPerPage).toInt() + 1
 
-            for (i in firstIndexInPage .. lastIndexInPage ) {
+            for (i in firstIndexInPage .. lastIndexInPage) {
                 val model = listItemActivities[i]
                 filterList.add(model)
             }

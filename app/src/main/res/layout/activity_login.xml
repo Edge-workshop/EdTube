@@ -9,16 +9,6 @@
     android:id="@+id/xMainView"
     >
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:visibility="invisible"/>
-
     <TextView
         android:id="@+id/tvTitle"
         android:transitionName="appTitle"
@@ -32,7 +22,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintVertical_bias=".25"/>
-
 
     <EditText
         android:id="@+id/etUsername"
@@ -104,7 +93,15 @@
         app:layout_constraintTop_toBottomOf="@+id/tvOR"
         android:layout_marginTop="32dp" />
 
-
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="invisible"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

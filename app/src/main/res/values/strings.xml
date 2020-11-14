@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">EdTube</string>
 
+    <!--E-->
+    <string name="exit_dialog">Do you want to close this application ?</string>
+
     <!--G-->
     <string name="general_unexpected_error">An unexpected error has occurred, please try again later</string>
 
@@ -12,6 +15,7 @@
 
     <!--N-->
     <string name="number_of_video">Number of video(s):</string>
+    <string name="no">No</string>
 
     <!--o-->
     <string name="or">OR</string>
@@ -20,7 +24,7 @@
     <string name="password">Password</string>
     <string name="profile_icon">Profile icon</string>
     <string name="profile">Profile</string>
-
+    <string name="play_all">Play All</string>
 
     <!--S-->
     <string name="signIn">Sign in</string>
@@ -35,5 +39,6 @@
 
     <!--Y-->
     <string name="youtube_video_error">Something went wrong when loading video from YouTube!</string>
+    <string name="yes">Yes</string>
 
 </resources>

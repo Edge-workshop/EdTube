@@ -136,6 +136,7 @@ class LoginActivity : BaseActivity() {
 
     private fun signIn() {
         Log.i(TAG, "Function signIn is called")
+        widgetElementIsActive(false)
         val signInIntent = mGoogleSignInClient.signInIntent
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
@@ -176,12 +177,10 @@ class LoginActivity : BaseActivity() {
                         TAG,
                         "Google access request is completed and successfull going to HomePage activity"
                     )
-//                    val intent = Intent(this@LoginActivity, HomePage::class.java)
-//                    progressBar.visibility = View.INVISIBLE
-//                    startActivity(intent)
 
                     progressBar.visibility = View.INVISIBLE
                     showImageTransition(xMainView, tvTitle)
+                    widgetElementIsActive(true)
                 })
         } catch (e: ApiException) {
             // The ApiException status code indicates the detailed failure reason.
@@ -190,6 +189,7 @@ class LoginActivity : BaseActivity() {
         }
     }
 
+    //TODO don't forget to remove func no sign out in this page only for test
     private fun signOut() {
         mGoogleSignInClient.signOut()
             .addOnCompleteListener(this) {
@@ -235,6 +235,16 @@ class LoginActivity : BaseActivity() {
         tvOR.visibility = View.INVISIBLE
         regSignInButton.visibility = View.INVISIBLE
         googleSignInBtn.visibility = View.INVISIBLE
+    }
+
+    fun widgetElementIsActive(isActive: Boolean) {
+        if (isActive) {
+            googleSignInBtn.isClickable = true
+            regSignInButton.isClickable = true
+        } else {
+            googleSignInBtn.isClickable = false
+            regSignInButton.isClickable = false
+        }
     }
 }
 

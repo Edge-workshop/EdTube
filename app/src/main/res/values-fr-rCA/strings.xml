@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">EdTube</string>
+    <string name="exit_dialog">Voulez-vous fermer cette application ?</string>
     <string name="general_unexpected_error">Une erreur inattendue est survenue, veuillez réessayer plus tard</string>
     <string name="home">Page d\'acceuil</string>
     <string name="log_out">Déconnexion</string>
     <string name="number_of_video">Nombre de vidéo(s)</string>
+    <string name="no">Non</string>
     <string name="or">OU</string>
     <string name="password">Mot de passe</string>
+    <string name="play_all">Tout Jouer</string>
     <string name="profile_icon">Icône de profil</string>
     <string name="profile">Profi</string>
     <string name="signOut_succes">Déconnexion avec succès!</string>
@@ -15,4 +18,5 @@
     <string name="username">Nom d\'utilisateur</string>
     <string name="write_search_word">La recherche ne peut pas être vide</string>
     <string name="youtube_video_error">Une erreur s\'est produite lors du chargement de la vidéo depuis YouTube!</string>
+    <string name="yes">Oui</string>
 </resources>

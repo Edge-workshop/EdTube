@@ -93,11 +93,13 @@ class VideoViewActivity : YouTubeBaseActivity() {
             ) {
                 //Code section where to launch video
                 youtubeVideoID?.let {
-                    allVideoIDStr = arrayListOf()
-                    allVideoIDStr!!.add(youtubeVideoID!!)
+                    youtubePlayer?.loadVideo(youtubeVideoID) /** launch automatically when it's single video **/
                 }
 
-                youtubePlayer?.cueVideos(allVideoIDStr)
+                allVideoIDStr?.let {
+                    youtubePlayer?.cueVideos(allVideoIDStr) /** do not launch automatically when it's all list of videos **/
+                }
+
                 youtubePlayer?.setPlayerStateChangeListener(playerStateChangeListener)
                 youtubePlayer?.setPlaybackEventListener(playbackEventListener)
             }

@@ -158,6 +158,15 @@
         app:layout_constraintHorizontal_bias=".95"
         />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@+id/ibPlayBtn"
+        app:layout_constraintEnd_toEndOf="@+id/ibPlayBtn"
+        app:layout_constraintTop_toBottomOf="@+id/ibPlayBtn"
+        android:text="@string/play_all"
+        android:textSize="@dimen/dimens_10"/>
+
     <ImageView
         android:id="@+id/ivSelectedThumbnail"
         android:layout_width="match_parent"
@@ -168,6 +177,17 @@
         app:layout_constraintTop_toTopOf="@+id/glTopThumbnail"
         app:layout_constraintBottom_toBottomOf="@+id/glBottomThumbnail"/>
 
+    <ImageView
+        android:id="@+id/ivSinglePlay"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/play_circle_outline"
+        android:alpha=".6"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/glTopThumbnail"
+        app:layout_constraintBottom_toBottomOf="@+id/glBottomThumbnail"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvListVideo"

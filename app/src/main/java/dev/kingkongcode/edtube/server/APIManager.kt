@@ -9,7 +9,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.model.PlaylistCategory
-import dev.kingkongcode.edtube.model.PlaylistItemActivity
+import dev.kingkongcode.edtube.model.PlaylistItem
 import dev.kingkongcode.edtube.util.Constants
 import org.json.JSONObject
 import java.util.*
@@ -19,7 +19,7 @@ class APIManager {
     private lateinit var ctx: Context
     private val sharedPrefFile = "keystoragesaved"
     private var accessToken = Constants.instance.EMPTY_STRING
-    private var userSelectedListRecv = arrayListOf<PlaylistItemActivity>()
+    private var userSelectedListRecv = arrayListOf<PlaylistItem>()
 
     companion object{
         var instance: APIManager = APIManager()
@@ -84,13 +84,15 @@ class APIManager {
                 return headers
             }
         }
+
         queue.add(request)
     }
 
     fun requestUserPlaylist(context: Context, completion: (error: String?, userPlaylist: PlaylistCategory?) -> Unit) {
         this.ctx = context.applicationContext
         val sharedPreferences = ctx.getSharedPreferences("keystoragesaved", Context.MODE_PRIVATE)
-        val url = Constants.instance.YOUTUBE_BASE_URL+"/playlists?part=snippet%2CcontentDetails&maxResults=25&mine=true&access_token=${sharedPreferences.getString("access_token", "")}"
+        val url = Constants.instance.YOUTUBE_BASE_URL+"/playlists?part=snippet&part=contentDetails&maxResults=25&mine=true&access_token=${sharedPreferences.getString("access_token", "")}"
+
         Log.i("Req to obtain playlist",url)
         val queue = Volley.newRequestQueue(ctx)
 
@@ -116,10 +118,11 @@ class APIManager {
                 return headers
             }
         }
+
         queue.add(request)
     }
 
-    fun requestSelectedPlaylistDetails (context: Context, pListID: String,  nextPageToken: String?, completion: (error: String?, selectedPList: ArrayList<PlaylistItemActivity>?) -> Unit) {
+    fun requestSelectedPlaylistDetails (context: Context, pListID: String,  nextPageToken: String?, completion: (error: String?, selectedPList: ArrayList<PlaylistItem>?) -> Unit) {
         this.ctx = context.applicationContext
         val sharedPreferences = ctx.getSharedPreferences("keystoragesaved", Context.MODE_PRIVATE)
         var url = Constants.instance.YOUTUBE_BASE_URL+"/playlistItems?part=contentDetails&part=id&part=snippet&part=status&playlistId=${pListID}&access_token=${sharedPreferences.getString("access_token", "")}"
@@ -160,10 +163,54 @@ class APIManager {
                 return headers
             }
         }
+
         queue.add(request)
     }
 
-    fun requestSearchVideo (context: Context, requestWord: String,  completion: (error: String?, searchResultList: ArrayList<PlaylistItemActivity>?) -> Unit) {
+    fun requestGetVideoDuration (context: Context, allVideoId: ArrayList<String>, completion: (error: String?, durationVideoList: ArrayList<Pair<String, String>>?) -> Unit) {
+        this.ctx = context.applicationContext
+        val sharedPreferences = ctx.getSharedPreferences("keystoragesaved", Context.MODE_PRIVATE)
+        val queue = Volley.newRequestQueue(ctx)
+        var strVideoId = ""
+
+        for (videoId in allVideoId) {
+            if (!strVideoId.isNullOrEmpty()) {
+                strVideoId += ","
+            }
+
+            strVideoId += videoId
+        }
+
+        var url = Constants.instance.YOUTUBE_BASE_URL+"/videos?part=contentDetails&id=$strVideoId&access_token=${sharedPreferences.getString("access_token", "")}"
+        Log.i("Req video duration",url)
+
+        val bodyJSON = JSONObject()
+        val request = object : JsonObjectRequest(
+            Method.GET, url, bodyJSON,
+            Response.Listener { response ->
+                if (response != null) {
+                    val responseRecv = durationListRetriever(response)
+                    completion(null, responseRecv)
+                } else {
+                    completion(R.string.general_unexpected_error.toString(), null)
+                }
+            },
+            Response.ErrorListener { error ->
+                completion(error.toString(), null)
+            }
+        ) {
+            @Throws(AuthFailureError::class)
+            override fun getHeaders(): Map<String, String> {
+                val headers = HashMap<String, String>()
+                headers.putAll(getRegularHeaders())
+                return headers
+            }
+        }
+
+        queue.add(request)
+    }
+
+    fun requestSearchVideo (context: Context, requestWord: String,  completion: (error: String?, searchResultList: ArrayList<PlaylistItem>?) -> Unit) {
         this.ctx = context.applicationContext
         val sharedPreferences = ctx.getSharedPreferences("keystoragesaved", Context.MODE_PRIVATE)
         val url = Constants.instance.YOUTUBE_BASE_URL+"/search?part=snippet&maxResults=25&q=$requestWord&videoDuration=any&access_token=${sharedPreferences.getString("access_token", "")}"
@@ -176,7 +223,7 @@ class APIManager {
             Response.Listener { response ->
                 if (response != null) {
                     val responseRecv = PlaylistCategory(response)
-                    var userSelectedListRecv = arrayListOf<PlaylistItemActivity>()
+                    var userSelectedListRecv = arrayListOf<PlaylistItem>()
 
                     for (video in responseRecv.items){
                         userSelectedListRecv.add(video)
@@ -198,6 +245,25 @@ class APIManager {
                 return headers
             }
         }
+
         queue.add(request)
+    }
+
+    private fun durationListRetriever(resp: JSONObject) : ArrayList<Pair<String, String>> {
+        var complDurationList = arrayListOf<Pair<String, String>>()
+
+        resp.optJSONArray("items").let {
+            for (i in 0 until it.length()) {
+                var jsonObject = it.optJSONObject(i)
+                var videoId = jsonObject.optString("id")//put into variable
+                var secondJsonObj = jsonObject.optJSONObject("contentDetails")
+                var duration = secondJsonObj.optString("duration")//put into variable
+
+                var tempPair = Pair(videoId, duration)
+                complDurationList.add(tempPair)
+            }
+        }
+
+        return complDurationList
     }
 }

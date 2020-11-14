@@ -5,22 +5,21 @@ import android.os.Parcelable
 import dev.kingkongcode.edtube.util.Constants
 import org.json.JSONObject
 
-class YTRessource : Parcelable{
-
+class YTResource : Parcelable {
     var kind: String = Constants.instance.EMPTY_STRING
     var videoId: String = Constants.instance.EMPTY_STRING
 
-    constructor(){
+    constructor() {
         this.kind = Constants.instance.EMPTY_STRING
         this.videoId = Constants.instance.EMPTY_STRING
     }
 
-    constructor(json: JSONObject){
+    constructor(json: JSONObject) {
         this.kind = json.optString("kind",Constants.instance.EMPTY_STRING)
         this.videoId = json.optString("videoId")
     }
 
-    constructor(p: Parcel){
+    constructor(p: Parcel) {
         this.kind = p.readString()!!
         this.videoId = p.readString()!!
     }
@@ -34,12 +33,12 @@ class YTRessource : Parcelable{
         dest?.writeString(videoId)
     }
 
-    companion object CREATOR: Parcelable.Creator<YTRessource>{
-        override fun createFromParcel(source: Parcel): YTRessource {
-            return YTRessource(source)
+    companion object CREATOR: Parcelable.Creator<YTResource> {
+        override fun createFromParcel(source: Parcel): YTResource {
+            return YTResource(source)
         }
 
-        override fun newArray(size: Int): Array<YTRessource?> {
+        override fun newArray(size: Int): Array<YTResource?> {
             return arrayOfNulls(size)
         }
     }

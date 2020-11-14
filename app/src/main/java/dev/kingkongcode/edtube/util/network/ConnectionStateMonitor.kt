@@ -17,7 +17,7 @@ import dev.kingkongcode.edtube.R
 const val TAG = "ConnectionStateMonitor"
 
 open class ConnectionStateMonitor : ConnectivityManager.NetworkCallback() {
-    var networkRequest: NetworkRequest? = null
+    private var networkRequest: NetworkRequest? = null
     private var dialog: Dialog? = null
     private var mActivity: Activity? = null
 

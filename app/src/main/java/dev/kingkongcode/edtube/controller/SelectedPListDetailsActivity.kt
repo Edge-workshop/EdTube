@@ -3,12 +3,14 @@ package dev.kingkongcode.edtube.controller
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,10 +22,15 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.model.ETUser
 import dev.kingkongcode.edtube.dialogs.MyCustomDialog
-import dev.kingkongcode.edtube.model.PlaylistItemActivity
+import dev.kingkongcode.edtube.model.PlaylistItem
 import dev.kingkongcode.edtube.server.APIManager
 import dev.kingkongcode.edtube.util.BaseActivity
+import dev.kingkongcode.edtube.util.Constants
+import dev.kingkongcode.edtube.util.ConvertDurationIsoToString
+import java.time.Period
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.time.Duration
 
 private const val TAG = "SelectedPListDetails"
 
@@ -38,12 +45,14 @@ class SelectedPListDetailsActivity : BaseActivity() {
     private lateinit var tvNbrOfVideo: TextView
     private lateinit var ibPlayAllBtn: ImageButton
     private lateinit var ivSelectedThumbnail: ImageView
+    private lateinit var ivSinglePlay: ImageView
 
     private lateinit var youtubeVideoID: String
 
     private lateinit var rvListVideo: RecyclerView
     private lateinit var linearLayoutManager: LinearLayoutManager
-    private var mPlayList = arrayListOf<PlaylistItemActivity>()
+    private var mPlayList = arrayListOf<PlaylistItem>()
+    private var tempPlayList = arrayListOf<PlaylistItem>()
     private lateinit var playlistAdapter: SelectedPListDetailsActivity.PlaylistAdapter
 
     private lateinit var bottomNavigation: BottomNavigationView
@@ -65,6 +74,8 @@ class SelectedPListDetailsActivity : BaseActivity() {
         ibPlayAllBtn = findViewById(R.id.ibPlayBtn)
         //Main selected thumbnail
         ivSelectedThumbnail = findViewById(R.id.ivSelectedThumbnail)
+        //Single Play
+        ivSinglePlay = findViewById(R.id.ivSinglePlay)
 
         //List of all video in selected list
         rvListVideo = findViewById(R.id.rvListVideo)
@@ -127,7 +138,7 @@ class SelectedPListDetailsActivity : BaseActivity() {
         ibPlayAllBtn.setOnClickListener {
             val allVideoId = arrayListOf<String>()
             for (videoId in this.mPlayList){
-                allVideoId.add(videoId.snippet.ressourceId.videoId)
+                allVideoId.add(videoId.snippet.resourceId.videoId)
             }
 
             val intent = Intent(this@SelectedPListDetailsActivity,VideoViewActivity::class.java)
@@ -171,18 +182,39 @@ class SelectedPListDetailsActivity : BaseActivity() {
             error?.let { Toast.makeText(this@SelectedPListDetailsActivity,error,Toast.LENGTH_SHORT).show() }
 
             //Code section where we populate adapter with api response data
-            selectedPList?.let {
-                this.mPlayList.clear()
-                this.mPlayList.addAll(it)
-                rvListVideo.adapter?.notifyDataSetChanged()
-
-                //Code section where we initiate first thumbnails and store youtube video id that is link with thumbnail
-                if (!it[0].snippet.thumbnails.high.url.isNullOrEmpty()){
-                    Glide.with(this).load(it[0].snippet.thumbnails.high.url).into(ivSelectedThumbnail)
+            selectedPList?.let { xSelectedPList ->
+                tempPlayList = xSelectedPList.clone() as ArrayList<PlaylistItem>
+                var strVideoIdList = arrayListOf<String>()
+                for (videoStrId in tempPlayList ) {
+                    strVideoIdList.add(videoStrId.snippet.resourceId.videoId)
                 }
-                youtubeVideoID = it[0].snippet.ressourceId.videoId
+
+                APIManager.instance.requestGetVideoDuration(this@SelectedPListDetailsActivity, strVideoIdList, completion = {error, durationVideoList ->
+                    error?.let { Toast.makeText(this@SelectedPListDetailsActivity, it, Toast.LENGTH_LONG).show() }
+
+                    durationVideoList?.let {
+                        //Code section where we get list from API server and to match video id from user selected list from first API call
+                        for (durationPairObj in it) {
+                            for (videoStrId in tempPlayList) {
+                                if (durationPairObj.first == videoStrId.snippet.resourceId.videoId) {
+                                    videoStrId.duration = durationPairObj.second
+                                }
+                            }
+                        }
+
+                        this.mPlayList.clear()
+                        this.mPlayList.addAll(tempPlayList)
+                        rvListVideo.adapter?.notifyDataSetChanged()
+                        //Code section where we initiate first thumbnails and store youtube video id that is link with thumbnail
+                        if (!tempPlayList[0].snippet.thumbnails.high.url.isNullOrEmpty()){
+                            Glide.with(this@SelectedPListDetailsActivity).load(tempPlayList[0].snippet.thumbnails.high.url).into(ivSelectedThumbnail)
+                        }
+
+                        ivSinglePlay.visibility = View.VISIBLE
+                        youtubeVideoID = tempPlayList[0].snippet.resourceId.videoId
+                    }
+                })
             }
-            progressBar.visibility = View.INVISIBLE
         })
     }
 
@@ -220,7 +252,7 @@ class SelectedPListDetailsActivity : BaseActivity() {
             }
     }
 
-    private inner class PlaylistAdapter(private val mContext: Context, private var dataSet: List<PlaylistItemActivity>) : RecyclerView.Adapter<SelectedPListDetailsActivity.PlaylistAdapter.VideoViewHolder>(), View.OnClickListener {
+    private inner class PlaylistAdapter(private val mContext: Context, private var dataSet: List<PlaylistItem>) : RecyclerView.Adapter<SelectedPListDetailsActivity.PlaylistAdapter.VideoViewHolder>(), View.OnClickListener {
         private var oldIndexSelected = 0
         private var isJustStarted = true
 
@@ -229,10 +261,10 @@ class SelectedPListDetailsActivity : BaseActivity() {
             var tvTrackTitle = itemView.findViewById<TextView>(R.id.tvTrackTitle)
             var tvDuration = itemView.findViewById<TextView>(R.id.tvDuration)
 
-            fun bind(video: PlaylistItemActivity, position: Int) {
+            fun bind(video: PlaylistItem, position: Int) {
                 tvTrackNumber.text = (position + 1).toString()
                 tvTrackTitle.text = video.snippet.title
-                tvDuration.text = "N/A"
+                tvDuration.text = ConvertDurationIsoToString.convert(video.duration)
             }
         }
 
@@ -244,6 +276,7 @@ class SelectedPListDetailsActivity : BaseActivity() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) : PlaylistAdapter.VideoViewHolder {
             val layout =  R.layout.video_details_row
             val view = LayoutInflater.from(mContext).inflate(layout, parent, false)
+            progressBar.visibility = View.INVISIBLE
             return VideoViewHolder(view)
         }
 
@@ -274,7 +307,7 @@ class SelectedPListDetailsActivity : BaseActivity() {
                 //Code section to send image thumbnails to main view when user click on specific row
                 if (!video.snippet.thumbnails.high.url.isNullOrEmpty()) {
                     Glide.with(mContext).load(video.snippet.thumbnails.high.url).into(ivSelectedThumbnail)
-                    youtubeVideoID = video.snippet.ressourceId.videoId
+                    youtubeVideoID = video.snippet.resourceId.videoId
                 }
 
                 //Code section to reset proper value in dataset in adapter

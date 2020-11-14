@@ -8,40 +8,7 @@ import android.net.ConnectivityManager
 import dev.kingkongcode.edtube.R
 
 open class NetworkStateConnection : BroadcastReceiver() {
-    private val TAG = "NetworkStateConnection"
-    private var ourInstance: NetworkStateConnection? = null
-    private var isConnected = false
-    private var connectActStr: String = ""
-    private var connectMobStr: String = ""
     private var dialog: Dialog? = null
-
-    fun getConnectActStr() : String? {
-        return connectActStr
-    }
-
-    fun setConnectActStr(connectActStr: String) {
-        this.connectActStr = connectActStr
-    }
-
-    fun getConnectMobStr() : String? {
-        return connectMobStr
-    }
-
-    fun setConnectMobStr(connectMobStr: String) {
-        this.connectMobStr = connectMobStr
-    }
-
-    fun isConnected() : Boolean {
-        return isConnected
-    }
-
-    fun setConnected(connected: Boolean) {
-        isConnected = connected
-    }
-
-    fun getInstance() : NetworkStateConnection? {
-        return ourInstance
-    }
 
     fun NetworkStateConnection(context: Context?) : NetworkStateConnection {
         dialog = Dialog(context!!)
@@ -49,11 +16,6 @@ open class NetworkStateConnection : BroadcastReceiver() {
         dialog!!.setTitle("Connection Lost")
         dialog!!.setCancelable(false)
         return this
-    }
-
-    fun getOurInstance(context: Context?) : NetworkStateConnection? {
-        if (ourInstance == null) ourInstance =  NetworkStateConnection(context)
-        return ourInstance
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -69,14 +31,5 @@ open class NetworkStateConnection : BroadcastReceiver() {
                 if (dialog != null && dialog!!.isShowing) dialog!!.dismiss()
             }
         }
-
-//        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-//        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-//            //when gps is on
-//        } else {
-//            //when gps is off
-//            Toast.makeText(context, "Please switch on the GPS", Toast.LENGTH_LONG).show()
-//
-//        }
     }
 }

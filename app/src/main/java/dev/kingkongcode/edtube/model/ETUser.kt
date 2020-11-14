@@ -4,7 +4,7 @@ import android.net.Uri
 import android.os.Parcel
 import android.os.Parcelable
 
-data class ETUser (val firstName: String?, val lastName: String?, val email: String?, val userPhoto: Uri? ) : Parcelable{
+data class ETUser (val firstName: String?, val lastName: String?, val email: String?, val userPhoto: Uri? ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString(),
         parcel.readString(),
@@ -33,5 +33,4 @@ data class ETUser (val firstName: String?, val lastName: String?, val email: Str
             return arrayOfNulls(size)
         }
     }
-
 }
