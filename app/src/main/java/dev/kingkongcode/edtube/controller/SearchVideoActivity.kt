@@ -21,6 +21,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dev.kingkongcode.edtube.R
+import dev.kingkongcode.edtube.databinding.ActivitySearchVideoBinding
 import dev.kingkongcode.edtube.model.ETUser
 import dev.kingkongcode.edtube.dialogs.MyCustomDialog
 import dev.kingkongcode.edtube.model.PlaylistItem
@@ -31,50 +32,28 @@ import dev.kingkongcode.edtube.util.ConvertDurationIsoToString
 private const val TAG = "SearchVideoActivity"
 
 class SearchVideoActivity : BaseActivity() {
-    private lateinit var main: ConstraintLayout
-    private lateinit var progressBar: ProgressBar
-
-    private lateinit var ivProfilePic: ImageView
-    private lateinit var etSearchBar: EditText
-    private lateinit var ibConfirmOrDelete: ImageButton
-
-    private lateinit var rvYTVideoList: RecyclerView
+    private lateinit var binding: ActivitySearchVideoBinding
     private lateinit var linearLayoutManager: LinearLayoutManager
     private var mSearchResultList = arrayListOf<PlaylistItem>()
     private lateinit var playlistAdapter: SearchVideoActivity.VideoListAdapter
     private var tempSearchFilter = arrayListOf<PlaylistItem>()
-
-    private lateinit var bottomNavigation: BottomNavigationView
 
     private lateinit var etUser: ETUser
     private lateinit var mGoogleSignInClient : GoogleSignInClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_search_video)
+        binding = ActivitySearchVideoBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         Log.i(TAG,"onCreate is called")
 
-        //Main Layout view
-        main = findViewById(R.id.mainView)
-        //ProgressBar
-        progressBar = findViewById(R.id.progressBar)
-        //Profil Picture
-        ivProfilePic = findViewById(R.id.ivProfileAvatar)
-        //SearchBar
-        etSearchBar = findViewById(R.id.etSearchBar)
-        //Confirm or Delete button for search request word
-        ibConfirmOrDelete = findViewById(R.id.ibConfirmOrDelete)
-        //Video List
-        rvYTVideoList = findViewById(R.id.rvYTVideoList)
         linearLayoutManager = LinearLayoutManager(this)
-        rvYTVideoList.layoutManager = linearLayoutManager
-        //Bottom Navigation
-        bottomNavigation = findViewById(R.id.bottomNavigation)
-        bottomNavigation.selectedItemId = R.id.home_page_menu_search
+        binding.rvYTVideoList.layoutManager = linearLayoutManager
+        binding.bottomNavigation.selectedItemId = R.id.home_page_menu_search
 
         //Initialize RecycleView and adapter
         playlistAdapter = VideoListAdapter(this@SearchVideoActivity,this.mSearchResultList)
-        rvYTVideoList.adapter = playlistAdapter
+        binding.rvYTVideoList.adapter = playlistAdapter
 
         initiate()
     }
@@ -90,9 +69,9 @@ class SearchVideoActivity : BaseActivity() {
             //Code to retreive profile pic from google sign in or else default pic
             Glide.with(this).load(etUser.userPhoto).
             diskCacheStrategy(DiskCacheStrategy.NONE).
-            error(R.drawable.profile_pic_na).into(ivProfilePic)
+            error(R.drawable.profile_pic_na).into(binding.ivProfilePic)
 
-            ivProfilePic.setOnClickListener {
+            binding.ivProfilePic.setOnClickListener {
                 Log.i(TAG,"User click on profil icon custom dialog show")
                 MyCustomDialog(etUser,this@SearchVideoActivity).show(supportFragmentManager,"MyCustomFragment")
             }
@@ -100,14 +79,14 @@ class SearchVideoActivity : BaseActivity() {
 
         //Code ro hide keyboard on all editText
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        main.setOnClickListener {
-            imm.hideSoftInputFromWindow(etSearchBar.windowToken, 0)
+        binding.mainView.setOnClickListener {
+            imm.hideSoftInputFromWindow(binding.etSearchBar.windowToken, 0)
         }
 
         //Code section where we specify action on soft keyboard's Ok button
-        etSearchBar.setOnEditorActionListener { _, i, keyEvent ->
+        binding.etSearchBar.setOnEditorActionListener { _, i, keyEvent ->
             if ((keyEvent != null && (keyEvent.keyCode == KeyEvent.KEYCODE_ENTER)) || (i == EditorInfo.IME_ACTION_DONE)) {
-                ibConfirmOrDelete.performClick()
+                binding.ibConfirmOrDelete.performClick()
                 true
             }
             false
@@ -115,13 +94,13 @@ class SearchVideoActivity : BaseActivity() {
 
         //Bouton Search
         var isDeleting = false
-        ibConfirmOrDelete.setOnClickListener {
-            if (!etSearchBar.text.isNullOrEmpty() && !isDeleting) {
+        binding.ibConfirmOrDelete.setOnClickListener {
+            if (!binding.etSearchBar.text.isNullOrEmpty() && !isDeleting) {
                 isDeleting = true
-                progressBar.visibility = View.VISIBLE
-                ibConfirmOrDelete.setImageResource(R.drawable.ic_morph_reverse)
+                binding.progressBar.visibility = View.VISIBLE
+                binding.ibConfirmOrDelete.setImageResource(R.drawable.ic_morph_reverse)
 
-                APIManager.instance.requestSearchVideo(this@SearchVideoActivity, etSearchBar.text.toString(), completion = { error, searchResultList ->
+                APIManager.instance.requestSearchVideo(this@SearchVideoActivity, binding.etSearchBar.text.toString(), completion = { error, searchResultList ->
                     error?.let { Toast.makeText(this@SearchVideoActivity,error,Toast.LENGTH_SHORT).show() }
 
                     searchResultList?.let { xSelectedPList ->
@@ -149,28 +128,28 @@ class SearchVideoActivity : BaseActivity() {
 
                                 this.mSearchResultList.clear()
                                 this.mSearchResultList.addAll(tempSearchFilter)
-                                this.rvYTVideoList.adapter?.notifyDataSetChanged()
-                                progressBar.visibility = View.INVISIBLE
+                                this.binding.rvYTVideoList.adapter?.notifyDataSetChanged()
+                                binding.progressBar.visibility = View.INVISIBLE
                             }
                         })
                     }
                 })
 
                 //Code section to automatically hide editText Keyboard
-                main.performClick()
-            } else if (!etSearchBar.text.isNullOrEmpty() && isDeleting) {
-                etSearchBar.text.clear()
+                binding.mainView.performClick()
+            } else if (!binding.etSearchBar.text.isNullOrEmpty() && isDeleting) {
+                binding.etSearchBar.text.clear()
                 isDeleting = false
-                ibConfirmOrDelete.setImageResource(R.drawable.ic_morph)
+                binding.ibConfirmOrDelete.setImageResource(R.drawable.ic_morph)
                 tempSearchFilter.clear()
 
                 //Code section to automatically hide editText Keyboard
-                main.performClick()
+                binding.mainView.performClick()
             } else Toast.makeText(this,getString(R.string.write_search_word),Toast.LENGTH_SHORT).show()
         }
 
         //Code section for Bottom Navigation menu item
-        bottomNavigation.setOnNavigationItemSelectedListener {
+        binding.bottomNavigation.setOnNavigationItemSelectedListener {
             when(it.itemId) {
                 R.id.home_page_menu_home -> {
                     val intent = Intent(this@SearchVideoActivity,HomePageActivity::class.java)
@@ -206,7 +185,7 @@ class SearchVideoActivity : BaseActivity() {
             // negative button text and action
             .setNegativeButton(getString(R.string.no), DialogInterface.OnClickListener {
                     dialog, id -> dialog.cancel()
-                bottomNavigation.selectedItemId = R.id.home_page_menu_search
+                binding.bottomNavigation.selectedItemId = R.id.home_page_menu_search
             })
 
         // create dialog box

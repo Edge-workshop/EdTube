@@ -47,7 +47,7 @@
                     >
 
                     <ImageView
-                        android:id="@+id/ivProfileAvatar"
+                        android:id="@+id/ivProfilePic"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -145,7 +145,7 @@
         />
 
     <ImageButton
-        android:id="@+id/ibPlayBtn"
+        android:id="@+id/ibPlayAllBtn"
         android:layout_width="@dimen/dimens_40"
         android:layout_height="@dimen/dimens_40"
         android:src="@drawable/play_circle"

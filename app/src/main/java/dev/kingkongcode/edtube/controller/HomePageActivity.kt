@@ -9,7 +9,7 @@ import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -17,10 +17,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import dev.kingkongcode.edtube.R
+import dev.kingkongcode.edtube.databinding.ActivityHomePageBinding
+import dev.kingkongcode.edtube.databinding.PlaylistCellBinding
 import dev.kingkongcode.edtube.model.ETUser
 import dev.kingkongcode.edtube.dialogs.MyCustomDialog
+import dev.kingkongcode.edtube.model.PlaylistItem
 import dev.kingkongcode.edtube.server.APIManager
 import dev.kingkongcode.edtube.util.BaseActivity
 import dev.kingkongcode.edtube.util.PaginationList
@@ -30,33 +32,22 @@ private const val TAG = "HomePage"
 private const val RC_SIGN_IN = 0
 
 class HomePageActivity : BaseActivity() {
+    private lateinit var binding: ActivityHomePageBinding
     private lateinit var accessToken: String
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var mGoogleSignInClient: GoogleSignInClient
-    private lateinit var progressBar: ProgressBar
-
-    private lateinit var layoutHomePageView: ConstraintLayout
-    private lateinit var tvUsernameTitle: TextView
-
-    private lateinit var ivProfilePic: ImageView
-
-    private lateinit var playlistGridView: GridView
     private lateinit var playlistAdapter: PlaylistAdapter
-    private var userPList = arrayListOf<dev.kingkongcode.edtube.model.PlaylistItem>()
+    private var userPList = arrayListOf<PlaylistItem>()
 
-    private lateinit var pageNbr: TextView
     private var currentPage: Int = 1
     private var maxPage: Int = 1
-    private lateinit var prevPageArrow: ImageButton
-    private lateinit var nextPageArrow: ImageButton
-
-    private lateinit var bottomNav: BottomNavigationView
 
     private lateinit var etUser: ETUser
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home_page)
+        binding = ActivityHomePageBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         Log.i(TAG,"onCreate is called")
 
         sharedPreferences = this.getSharedPreferences("keystoragesaved", Context.MODE_PRIVATE)
@@ -66,31 +57,12 @@ class HomePageActivity : BaseActivity() {
         val expiresIn = sharedPreferences.getInt("expires_in", 0)
         val tokenType = sharedPreferences.getString("token_type", "")
 
-        //RootView
-        layoutHomePageView = findViewById(R.id.layoutHomePageView)
-        //ProgressBar
-        progressBar = findViewById(R.id.progressBar)
-        //Main Title
-        tvUsernameTitle = findViewById(R.id.tvUsernameBigTitle)
-        //Profile Picture
-        ivProfilePic = findViewById(R.id.ivProfileAvatar)
-        //PlaylistGridview
-        playlistGridView = findViewById(R.id.gvAllPlaylist)
-        //Page View nbr
-        pageNbr = findViewById(R.id.tvPagination)
-        //Back page arrow
-        prevPageArrow = findViewById(R.id.backBtn)
-        //Next page arrow
-        nextPageArrow = findViewById(R.id.fowardBtn)
-        //Bottom Navigation
-        bottomNav = findViewById(R.id.bottomNavigation)
-
         initiate()
     }
 
     private fun initiate() {
         Log.i(TAG,"Function initiate is called")
-        progressBar.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.VISIBLE
         val acct = GoogleSignIn.getLastSignedInAccount(this)
 
         if (acct != null) {
@@ -101,14 +73,14 @@ class HomePageActivity : BaseActivity() {
                 "${etUser.firstName}' s Playlist."
             } else "La Playlist à ${etUser.firstName}."
 
-            tvUsernameTitle.text = completeStringTitle
+            binding.tvUsernameBigTitle.text = completeStringTitle
 
             //Code to retreive profile pic from google sign in or else default pic
             Glide.with(this).load(etUser.userPhoto).
             diskCacheStrategy(DiskCacheStrategy.NONE).
-            error(R.drawable.profile_pic_na).into(ivProfilePic)
+            error(R.drawable.profile_pic_na).into(binding.ivProfilePic)
 
-            ivProfilePic.setOnClickListener {
+            binding.ivProfilePic.setOnClickListener {
                 Log.i(TAG,"User click on profil icon custom dialog show")
                 MyCustomDialog(etUser,this@HomePageActivity).show(supportFragmentManager,"MyCustomFragment")
             }
@@ -117,12 +89,12 @@ class HomePageActivity : BaseActivity() {
         reqListApi()
 
         //Code section for Previous page with pagination function
-        prevPageArrow.setOnClickListener {
+        binding.prevPageArrow.setOnClickListener {
             if (currentPage > 1) {
                 currentPage -= 1
                 //Code section to display user current page and max page
                 val (a, b) = PaginationList.showNbrPage(userPList, currentPage)
-                pageNbr.text = a
+                binding.pageNbr.text = a
                 maxPage = b
                 //Code section to select right items on the list
                 val filterUserList = PaginationList.filterPage(userPList, currentPage)
@@ -136,12 +108,12 @@ class HomePageActivity : BaseActivity() {
         }
 
         //Code section for Next page with pagination function
-        nextPageArrow.setOnClickListener {
+        binding.nextPageArrow.setOnClickListener {
             if (currentPage < maxPage) {
                 currentPage += 1
                 //Code section to display user current page and max page
                 val (a, b) = PaginationList.showNbrPage(userPList, currentPage)
-                pageNbr.text = a
+                binding.pageNbr.text = a
                 maxPage = b
                 //Code section to display user current page and max page
                 val filterUserList = PaginationList.filterPage(userPList, currentPage)
@@ -155,7 +127,7 @@ class HomePageActivity : BaseActivity() {
         }
 
         //Code section for Bottom Navigation menu item
-        bottomNav.setOnNavigationItemSelectedListener {
+        binding.bottomNav.setOnNavigationItemSelectedListener {
             when(it.itemId) {
                 R.id.home_page_menu_home -> {
                     true
@@ -244,7 +216,7 @@ class HomePageActivity : BaseActivity() {
             // negative button text and action
             .setNegativeButton("NO", DialogInterface.OnClickListener {
                     dialog, id -> dialog.cancel()
-                bottomNav.selectedItemId = R.id.home_page_menu_home
+                binding.bottomNav.selectedItemId = R.id.home_page_menu_home
             })
 
         // create dialog box
@@ -269,7 +241,7 @@ class HomePageActivity : BaseActivity() {
         APIManager.instance.requestUserPlaylist(this, completion = { error, userPlaylist ->
             Log.i(TAG,"APIManager requestUserPlaylist response receive in activity")
 
-            progressBar?.let { it.visibility = View.INVISIBLE }
+            binding.progressBar?.let { it.visibility = View.INVISIBLE }
 
             error?.let { Toast.makeText(this@HomePageActivity,error,Toast.LENGTH_SHORT).show() }
 
@@ -278,14 +250,14 @@ class HomePageActivity : BaseActivity() {
                 userPList = it.items
                 //Code section to display user current page and max page
                 val (a, b) = PaginationList.showNbrPage(userPList, currentPage)
-                pageNbr.text = a
+                binding.pageNbr.text = a
                 maxPage = b
 
                 playlistAdapter = PlaylistAdapter(
                     //Code section to display user current page and max page
                     this, PaginationList.filterPage(userPList, currentPage)
                 )
-                playlistGridView.adapter = playlistAdapter
+                binding.playlistGridView.adapter = playlistAdapter
             }
         })
     }
@@ -360,4 +332,48 @@ class HomePageActivity : BaseActivity() {
             return convertView!!
         }
     }
+
+//    inner class PlaylistAdapter( private val mContext: Context, private val dataSet: List<PlaylistItem>) : RecyclerView.Adapter<PlaylistAdapter.ViewHolder>() {
+//        override fun onCreateViewHolder(
+//            parent: ViewGroup,
+//            viewType: Int
+//        ) : ViewHolder {
+//            val binding = PlaylistCellBinding.inflate(
+//                LayoutInflater.from(parent.context),
+//                parent,
+//                false)
+//            return ViewHolder(binding)
+//        }
+//
+//        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+//            val playlistItem: PlaylistItem = dataSet[position]
+//            holder.bind(playlistItem)
+//        }
+//
+//        override fun getItemCount(): Int {
+//            return dataSet.size
+//        }
+//
+//        inner class ViewHolder(private val itemBinding: PlaylistCellBinding ) : RecyclerView.ViewHolder(binding.root) {
+//            fun bind(playlistItem: PlaylistItem) {
+//                itemBinding.tvPlaylistTitle.text = playlistItem.snippet.title
+//                val nbrOfVideoStr = getString(R.string.number_of_video)
+//                val videoNbr = playlistItem.detailsXItem.itemCountStr
+//                itemBinding.tvNbrOfVideo.text = nbrOfVideoStr+"\t\t"+videoNbr
+//
+//                if (playlistItem.snippet.thumbnails.high.url.isNotEmpty()){
+//                    Glide.with(mContext).load(playlistItem.snippet.thumbnails.high.url).into(itemBinding.ivThumbnail)
+//                }
+//
+//                itemBinding.root.setOnClickListener {
+//                    val intent = Intent(this@HomePageActivity,SelectedPListDetailsActivity::class.java)
+//                    intent.putExtra("selectedListID",playlistItem.listId)
+//                    intent.putExtra("videoNbr",videoNbr)
+//                    intent.putExtra("ETUser",etUser)
+//                    startActivity(intent)
+//                    finish()
+//                }
+//            }
+//        }
+//    }
 }

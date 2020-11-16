@@ -10,31 +10,29 @@ import com.google.android.youtube.player.YouTubeInitializationResult
 import com.google.android.youtube.player.YouTubePlayer
 import com.google.android.youtube.player.YouTubePlayerView
 import dev.kingkongcode.edtube.R
+import dev.kingkongcode.edtube.databinding.ActivityVideoViewBinding
 import dev.kingkongcode.edtube.server.Config
 import dev.kingkongcode.edtube.util.HideSystemUi
 
 private const val TAG = "VideoViewActivity"
 
 class VideoViewActivity : YouTubeBaseActivity() {
-    private lateinit var btnBack: ImageButton
+    private lateinit var binding: ActivityVideoViewBinding
 
-    private lateinit var ytYoutubePlayer: YouTubePlayerView
     private lateinit var onInitializedListener: YouTubePlayer.OnInitializedListener
     private var youtubeVideoID: String? = null
     private var allVideoIDStr: ArrayList<String>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_video_view)
+        binding = ActivityVideoViewBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         Log.i(TAG,"onCreate is called")
         //Code section Full screen
         HideSystemUi.hideSystemUi(this)
 
         //Back button
-        btnBack = findViewById(R.id.btnBack)
-        btnBack.setOnClickListener { onBackPressed() }
-        //YouTube player view
-        ytYoutubePlayer = findViewById(R.id.ytYoutubePlayer)
+        binding.btnBack.setOnClickListener { onBackPressed() }
 
         val extras: Bundle? = intent.extras
         if (extras != null) {
@@ -115,6 +113,6 @@ class VideoViewActivity : YouTubeBaseActivity() {
                 ).show()
             }
         }
-        ytYoutubePlayer.initialize(Config.current.API_KEY, onInitializedListener)
+        binding.ytYoutubePlayer.initialize(Config.current.API_KEY, onInitializedListener)
     }
 }

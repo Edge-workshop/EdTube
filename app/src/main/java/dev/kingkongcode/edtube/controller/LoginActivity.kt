@@ -7,18 +7,17 @@ import android.transition.Fade
 import android.util.Log
 import android.view.View
 import android.widget.*
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.Scope
 import com.google.android.gms.tasks.Task
 import dev.kingkongcode.edtube.R
+import dev.kingkongcode.edtube.databinding.ActivityLoginBinding
 import dev.kingkongcode.edtube.server.APIManager
 import dev.kingkongcode.edtube.server.Config
 import dev.kingkongcode.edtube.util.BaseActivity
@@ -28,39 +27,16 @@ private const val RC_SIGN_IN = 0
 private const val RC_GET_TOKEN = 90
 
 class LoginActivity : BaseActivity() {
-    private lateinit var xMainView: ConstraintLayout
-
-    private lateinit var progressBar: ProgressBar
-    private lateinit var tvTitle: TextView
-
-    private lateinit var etUsername: EditText
-    private lateinit var etPassword: EditText
-    private lateinit var googleSignInBtn: SignInButton
-    private lateinit var tvOR: TextView
+    private lateinit var binding: ActivityLoginBinding
     private lateinit var mGoogleSignInClient : GoogleSignInClient
-    private lateinit var regSignInButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         Log.i(TAG, "onCreate is called")
 
-        xMainView = findViewById(R.id.xMainView)
-        //Title
-        tvTitle = findViewById(R.id.tvTitle)
-        //ProgressBar
-        progressBar = findViewById(R.id.progressBar)
-        //Edit text for username
-        etUsername = findViewById(R.id.etUsername)
-        //Edit text for password
-        etPassword = findViewById(R.id.etPassword)
-        //OR text
-        tvOR = findViewById(R.id.tvOR)
-        //Regular SignIn button
-        regSignInButton = findViewById(R.id.btnRegSignIn)
-
         //Google SignIn button
-        googleSignInBtn = findViewById(R.id.signInBtn)
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestScopes(Scope(Config.current.YOUTUBE_AUTH_READONLY))
             .requestScopes(Scope(Config.current.YOUTUBE_AUTH_UPLOAD))
@@ -97,7 +73,7 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun initiate() {
-        regSignInButton.setOnClickListener {
+        binding.btnRegSignIn.setOnClickListener {
 //            val intent = Intent(this@LoginActivity, HomePage::class.java)
 //            startActivity(intent)
             Toast.makeText(this, "NOT implemented yet", Toast.LENGTH_SHORT).show()
@@ -106,9 +82,9 @@ class LoginActivity : BaseActivity() {
             signOut()
         }
 
-        googleSignInBtn.setOnClickListener {
+        binding.googleSignInBtn.setOnClickListener {
             Log.i(TAG, "Google sign in button was click by user")
-            progressBar.visibility = View.VISIBLE
+            binding.progressBar.visibility = View.VISIBLE
             signIn()
         }
     }
@@ -166,7 +142,7 @@ class LoginActivity : BaseActivity() {
                 deviceCode,
                 completion = { error ->
                     error?.let {
-                        progressBar.visibility = View.INVISIBLE
+                        binding.progressBar.visibility = View.INVISIBLE
                         Toast.makeText(this@LoginActivity, error, Toast.LENGTH_SHORT).show()
                     }
 
@@ -178,8 +154,8 @@ class LoginActivity : BaseActivity() {
                         "Google access request is completed and successfull going to HomePage activity"
                     )
 
-                    progressBar.visibility = View.INVISIBLE
-                    showImageTransition(xMainView, tvTitle)
+                    binding.progressBar.visibility = View.INVISIBLE
+                    showImageTransition(binding.xMainView, binding.tvTitle)
                     widgetElementIsActive(true)
                 })
         } catch (e: ApiException) {
@@ -200,7 +176,8 @@ class LoginActivity : BaseActivity() {
 
     private fun showImageTransition(view: View, text: TextView) {
         //setup element for view transition
-        val text = view.findViewById<TextView>(R.id.tvTitle)
+//        val text = view.findViewById<TextView>(R.id.tvTitle)
+        val text = binding.tvTitle
         val imagePair = androidx.core.util.Pair.create(text as View, "appTitle")
 
 //        val text2 = view.findViewById<TextView>(R.id.tvAppTitle)
@@ -222,28 +199,28 @@ class LoginActivity : BaseActivity() {
     }
 
     fun showElementOnScreen() {
-        etUsername.visibility = View.VISIBLE
-        etPassword.visibility = View.VISIBLE
-        tvOR.visibility = View.VISIBLE
-        regSignInButton.visibility = View.VISIBLE
-        googleSignInBtn.visibility = View.VISIBLE
+        binding.etUsername.visibility = View.VISIBLE
+        binding.etPassword.visibility = View.VISIBLE
+        binding.tvOR.visibility = View.VISIBLE
+        binding.btnRegSignIn.visibility = View.VISIBLE
+        binding.googleSignInBtn.visibility = View.VISIBLE
     }
 
     fun hideElementOnScreen() {
-        etUsername.visibility = View.INVISIBLE
-        etPassword.visibility = View.INVISIBLE
-        tvOR.visibility = View.INVISIBLE
-        regSignInButton.visibility = View.INVISIBLE
-        googleSignInBtn.visibility = View.INVISIBLE
+        binding.etUsername.visibility = View.INVISIBLE
+        binding.etPassword.visibility = View.INVISIBLE
+        binding.tvOR.visibility = View.INVISIBLE
+        binding.btnRegSignIn.visibility = View.INVISIBLE
+        binding.googleSignInBtn.visibility = View.INVISIBLE
     }
 
     fun widgetElementIsActive(isActive: Boolean) {
         if (isActive) {
-            googleSignInBtn.isClickable = true
-            regSignInButton.isClickable = true
+            binding.googleSignInBtn.isClickable = true
+            binding.btnRegSignIn.isClickable = true
         } else {
-            googleSignInBtn.isClickable = false
-            regSignInButton.isClickable = false
+            binding.googleSignInBtn.isClickable = false
+            binding.btnRegSignIn.isClickable = false
         }
     }
 }

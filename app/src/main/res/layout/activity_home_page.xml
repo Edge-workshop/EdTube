@@ -51,7 +51,7 @@
                     >
 
                     <ImageView
-                        android:id="@+id/ivProfileAvatar"
+                        android:id="@+id/ivProfilePic"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -127,7 +127,7 @@
         android:layout_margin="@dimen/playlist_text_margin"/>
 
     <GridView
-        android:id="@+id/gvAllPlaylist"
+        android:id="@+id/playlistGridView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:gravity="center"
@@ -143,34 +143,34 @@
         />
 
     <TextView
-        android:id="@+id/tvPagination"
+        android:id="@+id/pageNbr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/gvAllPlaylist"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
+        app:layout_constraintTop_toBottomOf="@+id/playlistGridView"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNav"
         tools:text="0/0"
         android:textColor="@color/secondaryTextColor"/>
 
     <ImageButton
-        android:id="@+id/backBtn"
+        android:id="@+id/prevPageArrow"
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:src="@drawable/left_arrow"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/tvPagination"
-        app:layout_constraintTop_toBottomOf="@+id/gvAllPlaylist"
+        app:layout_constraintEnd_toStartOf="@+id/pageNbr"
+        app:layout_constraintTop_toBottomOf="@+id/playlistGridView"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"/>
 
     <ImageButton
-        android:id="@+id/fowardBtn"
+        android:id="@+id/nextPageArrow"
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:src="@drawable/right_arrow"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/tvPagination"
-        app:layout_constraintTop_toBottomOf="@+id/gvAllPlaylist"
+        app:layout_constraintStart_toEndOf="@+id/pageNbr"
+        app:layout_constraintTop_toBottomOf="@+id/playlistGridView"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"/>
 
     <ProgressBar
@@ -184,7 +184,7 @@
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
+        android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
         android:background="@color/red"
