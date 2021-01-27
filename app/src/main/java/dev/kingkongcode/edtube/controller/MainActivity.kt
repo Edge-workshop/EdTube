@@ -5,37 +5,45 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
 import android.view.animation.AnimationUtils
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import dev.kingkongcode.edtube.R
+import dev.kingkongcode.edtube.databinding.ActivityMainBinding
 import dev.kingkongcode.edtube.util.BaseActivity
 
-private const val TAG = "MainActivity"
+/***
+ * SplashScreen Activity
+ * */
 
 class MainActivity : BaseActivity() {
-    /***
-     * SplashScreen Activity
-     * */
+    private lateinit var binding: ActivityMainBinding
 
-    private lateinit var tvTitle: TextView
-
-    private lateinit var countDownTimer: CountDownTimer
-    private val initialCountDownTime: Long = 850
-    private val countDownInterval: Long = 1000
+    private companion object {
+        private const val TAG = "MainActivity"
+        private const val INITIAL_COUNTDOWN_TIME: Long = 850
+        private const val COUNTDOWN_INTERVAL: Long = 1000
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         Log.i(TAG, "onCreate is called")
-        //App Title
-        tvTitle = findViewById(R.id.tvTitle)
+    }
 
-        /** scale animtion on title **/
+    override fun onResume() {
+        super.onResume()
+        titleAnimation()
+        setAutomaticTransition()
+    }
+
+    private fun titleAnimation() {
+        /** scale animation on title **/
         val scale = AnimationUtils.loadAnimation(this, R.anim.scale_up)
-        tvTitle.startAnimation(scale)
+        binding.tvTitle.startAnimation(scale)
+    }
 
+    private fun setAutomaticTransition() {
         //Code section to start timer to go automatically in Login page
-        countDownTimer = object : CountDownTimer(initialCountDownTime, countDownInterval) {
+        val countDownTimer = object : CountDownTimer(INITIAL_COUNTDOWN_TIME, COUNTDOWN_INTERVAL) {
             override fun onTick(p0: Long) {
             }
 

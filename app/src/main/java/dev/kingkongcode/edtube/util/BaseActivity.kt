@@ -30,21 +30,10 @@ open class BaseActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-    }
-
     override fun onStop() {
         super.onStop()
         //Stop BroadCastReceiver network connection for Mobile Data
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) cs.disable(this@BaseActivity) else unregisterReceiver(nc)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
 }

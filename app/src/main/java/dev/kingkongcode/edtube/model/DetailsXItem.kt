@@ -2,20 +2,13 @@ package dev.kingkongcode.edtube.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import dev.kingkongcode.edtube.util.Constants
 import org.json.JSONObject
 
-class DetailsXItem : Parcelable {
-    var itemCount: Int = 0
-    var itemCountStr: String = Constants.instance.EMPTY_STRING
+class DetailsXItem(json: JSONObject) : Parcelable {
+    private var itemCount: Int = json.optInt("itemCount", 0)
+    var itemCountStr: String
 
-    constructor() {
-        this.itemCount = 0
-        this.itemCountStr = this.itemCount.toString()
-    }
-
-    constructor(json: JSONObject) {
-        this.itemCount = json.optInt("itemCount", 0)
+    init {
         this.itemCountStr = this.itemCount.toString()
     }
 

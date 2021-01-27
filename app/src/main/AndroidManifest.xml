@@ -12,13 +12,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:configChanges="orientation"
         android:theme="@style/AppTheme">
         <activity
             android:name=".controller.SearchVideoActivity"
             android:screenOrientation="portrait"/>
         <activity android:name=".controller.VideoViewActivity"
-            android:configChanges="orientation"
+            android:configChanges="orientation|screenSize"
             />
         <activity android:name=".controller.SelectedPListDetailsActivity"
             android:screenOrientation="portrait"
@@ -45,3 +44,4 @@
     </application>
 
 </manifest>
+

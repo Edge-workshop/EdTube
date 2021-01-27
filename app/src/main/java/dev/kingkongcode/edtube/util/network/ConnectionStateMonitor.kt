@@ -36,7 +36,7 @@ open class ConnectionStateMonitor : ConnectivityManager.NetworkCallback() {
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         connectivityManager.registerNetworkCallback(networkRequest, this)
 
-        dialog = Dialog(context!!)
+        dialog = Dialog(context)
         dialog!!.setContentView(R.layout.no_internet_connection_msg_error)
         dialog!!.setTitle("Connection Lost")
         dialog!!.setCancelable(false)

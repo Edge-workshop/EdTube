@@ -1,50 +1,46 @@
 package dev.kingkongcode.edtube.util
 
-
 class ConvertDurationIsoToString {
-    data class EdTubeDuration(var time: String) {
-    }
 
     companion object {
         fun convert(time: String) : String {
-            var tempStr = Constants.instance.EMPTY_STRING
-            var hourStr = EdTubeDuration(Constants.instance.EMPTY_STRING)
-            var minStr = EdTubeDuration("00")
-            var secStr = EdTubeDuration("00")
-            var finalStr: String
+            var tempStr = Constants.EMPTY_STRING
+            var hourStr = Constants.EMPTY_STRING
+            var minStr = Constants.EMPTY_STRING
+            var secStr = Constants.EMPTY_STRING
+            val finalStr: String
 
             for (index in 2 until time.length) {
-                var char = time[index]
-                when (char) {
+                when (val char = time[index]) {
                     'H' -> {
-                        hourStr = EdTubeDuration(tempStr).copy()
-                        tempStr = Constants.instance.EMPTY_STRING
+                        hourStr = tempStr
+                        tempStr = Constants.EMPTY_STRING
                     }
 
                     'M' -> {
                         tempStr = if (tempStr.length == 1) {
                             tempStr.replace(tempStr,"0$tempStr")
                         } else tempStr
-                        minStr = EdTubeDuration(tempStr).copy()
-                        tempStr = Constants.instance.EMPTY_STRING
+                        minStr = tempStr
+                        tempStr = Constants.EMPTY_STRING
                     }
 
                     'S' -> {
                         tempStr = if (tempStr.length == 1) {
                             tempStr.replace(tempStr,"0$tempStr")
                         } else tempStr
-                        secStr = EdTubeDuration(tempStr).copy()
-                        tempStr = Constants.instance.EMPTY_STRING
+                        secStr = tempStr
+                        tempStr = Constants.EMPTY_STRING
                     }
 
                     else -> tempStr += char
                 }
             }
 
-            finalStr = if (hourStr.time != Constants.instance.EMPTY_STRING) {
-                "${hourStr.time}:${minStr.time}:${secStr.time}"
+            finalStr = if (hourStr.isNotEmpty()) {
+                "$hourStr:$minStr:$secStr"
             } else {
-                "${minStr.time}:${secStr.time}"
+                "$minStr:$secStr"
             }
 
             return finalStr

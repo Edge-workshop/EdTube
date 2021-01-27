@@ -114,7 +114,7 @@
                 />
 
             <TextView
-                android:id="@+id/tvemail"
+                android:id="@+id/tvEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="www.android_dev@gmail.com"
@@ -132,11 +132,11 @@
                 android:layout_height="0dp"
                 android:layout_marginTop="@dimen/dimens_16"
                 android:layout_marginHorizontal="@dimen/dimens_32"
-                android:text="OK"
+                android:text="@string/ok"
                 android:backgroundTint="@color/red"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvemail"
+                app:layout_constraintTop_toBottomOf="@+id/tvEmail"
                 app:layout_constraintDimensionRatio="9:1.4"/>
 
 

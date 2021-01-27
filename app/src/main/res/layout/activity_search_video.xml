@@ -46,7 +46,7 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/profilIconBgColor"
+                    android:background="@color/profileIconBgColor"
                     >
 
                     <ImageView
@@ -123,7 +123,8 @@
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
         android:layout_marginHorizontal="@dimen/dimens_56"
         android:paddingHorizontal="@dimen/dimens_8"
-        android:hint="Search in here"
+        android:hint="@string/search_in_here"
+        android:autofillHints="@string/search_in_here"
         android:maxLines="1"
         android:inputType="textCapWords"
         android:imeOptions="actionDone"
@@ -137,6 +138,7 @@
         android:layout_marginStart="@dimen/dimens_4"
         android:padding="@dimen/dimens_8"
         android:scaleType="fitCenter"
+        android:contentDescription="@string/search_logo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/etSearchBar"
         app:layout_constraintTop_toTopOf="@+id/etSearchBar"
@@ -150,6 +152,7 @@
         android:layout_margin="@dimen/dimens_8"
         android:padding="@dimen/dimens_8"
         android:scaleType="fitCenter"
+        android:contentDescription="@string/confirm_or_delete_btn"
         app:layout_constraintStart_toEndOf="@+id/etSearchBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/etSearchBar"

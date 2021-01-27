@@ -47,7 +47,7 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/profilIconBgColor"
+                    android:background="@color/profileIconBgColor"
                     >
 
                     <ImageView
@@ -120,26 +120,21 @@
         android:layout_height="wrap_content"
         tools:text="EDGE'S PLAYLIST"
         android:textColor="@color/white"
-        android:textSize="28dp"
+        android:textSize="28sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarMenu"
         android:layout_margin="@dimen/playlist_text_margin"/>
 
-    <GridView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/playlistGridView"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvUsernameBigTitle"
         app:layout_constraintBottom_toTopOf="@+id/glBottomGrid"
         android:layout_margin="@dimen/dimens_8"
-        android:numColumns="2"
-        android:horizontalSpacing="@dimen/dimens_5"
-        android:verticalSpacing="@dimen/dimens_5"
-        android:scrollbars="none"
         />
 
     <TextView
@@ -148,8 +143,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/playlistGridView"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNav"
+        app:layout_constraintTop_toTopOf="@+id/prevPageArrow"
+        app:layout_constraintBottom_toBottomOf="@+id/prevPageArrow"
         tools:text="0/0"
         android:textColor="@color/secondaryTextColor"/>
 
@@ -158,20 +153,24 @@
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:src="@drawable/left_arrow"
+        android:layout_marginBottom="@dimen/dimens_10"
+        android:contentDescription="@string/prev_page_arrow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/pageNbr"
-        app:layout_constraintTop_toBottomOf="@+id/playlistGridView"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"/>
+        app:layout_constraintBottom_toTopOf="@+id/bottomNav"
+        />
 
     <ImageButton
         android:id="@+id/nextPageArrow"
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:src="@drawable/right_arrow"
+        android:layout_marginBottom="@dimen/dimens_10"
+        android:contentDescription="@string/next_page_arrow"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/pageNbr"
-        app:layout_constraintTop_toBottomOf="@+id/playlistGridView"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"/>
+        app:layout_constraintBottom_toTopOf="@+id/bottomNav"
+        />
 
     <ProgressBar
         android:id="@+id/progressBar"

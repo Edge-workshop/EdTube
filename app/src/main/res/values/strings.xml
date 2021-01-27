@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">EdTube</string>
+    <!--b-->
+    <string name="button_back_arrow">Back arrow button</string>
+    <!--c-->
+    <string name="confirm_or_delete_btn">Confirm or delete button</string>
 
     <!--E-->
     <string name="exit_dialog">Do you want to close this application ?</string>
@@ -16,26 +20,39 @@
     <!--N-->
     <string name="number_of_video">Number of video(s):</string>
     <string name="no">No</string>
+    <string name="next_page_arrow">Next page arrow</string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="no_internet_subtext">Please check your internet connection and try again.</string>
+    <string name="no_connection_logo">No connection logo</string>
 
     <!--o-->
     <string name="or">OR</string>
+    <string name="ok">OK</string>
 
     <!--P-->
     <string name="password">Password</string>
     <string name="profile_icon">Profile icon</string>
     <string name="profile">Profile</string>
     <string name="play_all">Play All</string>
+    <string name="prev_page_arrow">Previous page arrow</string>
+    <string name="play_all_btn">Play all button</string>
 
     <!--S-->
     <string name="signIn">Sign in</string>
     <string name="search">Search</string>
+    <string name="search_in_here">Search in here</string>
+    <string name="search_logo">Search logo</string>
 
     <!--U-->
     <string name="username">Username</string>
 
+    <!--v-->
+    <string name="video_thumbnail">Video thumbnail</string>
+    <string name="video_thumbnail_btn">Play video button</string>
+
     <!--w-->
     <string name="write_search_word">Search can not be empty</string>
-    <string name="signOut_succes">Sign out successfully!</string>
+    <string name="signOut_success">Sign out successfully!</string>
 
     <!--Y-->
     <string name="youtube_video_error">Something went wrong when loading video from YouTube!</string>

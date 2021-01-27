@@ -2,13 +2,13 @@
 <resources>
     <color name="colorPrimary">#424042</color>
     <color name="colorPrimaryDark">#424042</color>
-    <color name="colorAccent">#03DAC5</color>
+
 
     <color name="primaryBgGrey">#424042</color>
     <color name="primaryBgBlack">#18191B</color>
     <color name="red">#D20000</color>
     <color name="white">#FFFFFF</color>
     <color name="secondaryTextColor">#989DA2</color>
-    <color name="profilIconBgColor">#E1CB00</color>
+    <color name="profileIconBgColor">#E1CB00</color>
     <color name="greenLetter">#0FD25B</color>
 </resources>

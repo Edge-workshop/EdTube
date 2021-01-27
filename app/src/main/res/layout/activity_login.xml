@@ -29,6 +29,7 @@
         android:layout_height="0dp"
         android:inputType="text"
         android:background="#F9F9F9"
+        android:autofillHints="@string/username"
         android:hint="@string/username"
         android:textColorHint="@color/secondaryTextColor"
         android:padding="8dp"

@@ -1,21 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">EdTube</string>
+    <string name="button_back_arrow">Bouton flèche arrière</string>
+    <string name="confirm_or_delete_btn">Bouton confirmer ou supprimer</string>
     <string name="exit_dialog">Voulez-vous fermer cette application ?</string>
     <string name="general_unexpected_error">Une erreur inattendue est survenue, veuillez réessayer plus tard</string>
     <string name="home">Page d\'acceuil</string>
     <string name="log_out">Déconnexion</string>
     <string name="number_of_video">Nombre de vidéo(s)</string>
     <string name="no">Non</string>
+    <string name="next_page_arrow">Page suivante</string>
+    <string name="no_internet_connection">Pas de connexion internet</string>
+    <string name="no_internet_subtext">S\'il vous plaît, vérifiez votre connexion à internet et réessayez.</string>
+    <string name="no_connection_logo">Logo pas de connexion internet</string>
     <string name="or">OU</string>
+    <string name="ok">OK</string>
     <string name="password">Mot de passe</string>
     <string name="play_all">Tout Jouer</string>
+    <string name="play_all_btn">Bouton tout jouer</string>
     <string name="profile_icon">Icône de profil</string>
     <string name="profile">Profi</string>
-    <string name="signOut_succes">Déconnexion avec succès!</string>
+    <string name="prev_page_arrow">Page précédente</string>
+    <string name="signOut_success">Déconnexion avec succès!</string>
     <string name="signIn">Se connecter</string>
     <string name="search">Chercher</string>
+    <string name="search_in_here">Chercher ici</string>
+    <string name="search_logo">Logo chercher</string>
     <string name="username">Nom d\'utilisateur</string>
+    <string name="video_thumbnail">Vignette vidéo</string>
+    <string name="video_thumbnail_btn">Bouton jouer vidéo</string>
     <string name="write_search_word">La recherche ne peut pas être vide</string>
     <string name="youtube_video_error">Une erreur s\'est produite lors du chargement de la vidéo depuis YouTube!</string>
     <string name="yes">Oui</string>
