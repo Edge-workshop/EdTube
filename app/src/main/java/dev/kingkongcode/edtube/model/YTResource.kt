@@ -6,16 +6,11 @@ import dev.kingkongcode.edtube.util.Constants
 import org.json.JSONObject
 
 class YTResource : Parcelable {
-    var kind: String = Constants.instance.EMPTY_STRING
-    var videoId: String = Constants.instance.EMPTY_STRING
-
-    constructor() {
-        this.kind = Constants.instance.EMPTY_STRING
-        this.videoId = Constants.instance.EMPTY_STRING
-    }
+    var kind: String
+    var videoId: String
 
     constructor(json: JSONObject) {
-        this.kind = json.optString("kind",Constants.instance.EMPTY_STRING)
+        this.kind = json.optString("kind",Constants.EMPTY_STRING)
         this.videoId = json.optString("videoId")
     }
 

@@ -2,27 +2,16 @@ package dev.kingkongcode.edtube.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import dev.kingkongcode.edtube.util.Constants
 import org.json.JSONObject
 
 class Snippet : Parcelable {
-    var publishedAt: String = Constants.instance.EMPTY_STRING
-    var channelId: String = Constants.instance.EMPTY_STRING
-    var title: String = Constants.instance.EMPTY_STRING
-    var description: String = Constants.instance.EMPTY_STRING
-    var thumbnails: Thumbnails = Thumbnails()
-    var channelTitle: String = Constants.instance.EMPTY_STRING
-    var resourceId: YTResource = YTResource()
-
-    constructor() {
-        this.publishedAt = Constants.instance.EMPTY_STRING
-        this.channelId = Constants.instance.EMPTY_STRING
-        this.title = Constants.instance.EMPTY_STRING
-        this.description = Constants.instance.EMPTY_STRING
-        this.thumbnails = Thumbnails()
-        this.channelTitle = Constants.instance.EMPTY_STRING
-        this.resourceId = YTResource()
-    }
+    private var publishedAt: String
+    private var channelId: String
+    var title: String
+    var description: String
+    lateinit var thumbnails: Thumbnails
+    private var channelTitle: String
+    lateinit var resourceId: YTResource
 
     constructor(jsonObject: JSONObject) {
         this.publishedAt = jsonObject.optString("publishedAt")

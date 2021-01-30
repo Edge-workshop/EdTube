@@ -5,17 +5,10 @@ import android.os.Parcelable
 import org.json.JSONObject
 
 class Thumbnails : Parcelable {
-    var default: ThumbnailsSettings = ThumbnailsSettings()
-    var medium: ThumbnailsSettings = ThumbnailsSettings()
-    var high: ThumbnailsSettings = ThumbnailsSettings()
-    var standard: ThumbnailsSettings = ThumbnailsSettings()
-
-    constructor() {
-        this.default= ThumbnailsSettings()
-        this.medium= ThumbnailsSettings()
-        this.high= ThumbnailsSettings()
-        this.standard= ThumbnailsSettings()
-    }
+    lateinit var default: ThumbnailsSettings
+    lateinit var medium: ThumbnailsSettings
+    lateinit var high: ThumbnailsSettings
+    lateinit var standard: ThumbnailsSettings
 
     constructor(jsonObject: JSONObject) {
         jsonObject.optJSONObject("default")?.let {

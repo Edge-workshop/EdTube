@@ -5,22 +5,10 @@ import android.os.Parcelable
 import dev.kingkongcode.edtube.util.Constants
 import org.json.JSONObject
 
-class ThumbnailsSettings : Parcelable {
-    var url: String = Constants.instance.EMPTY_STRING
-    var width: Int = 0
-    var height: Int = 0
-
-    constructor() {
-        this.url = Constants.instance.EMPTY_STRING
-        this.width = 0
-        this.height = 0
-    }
-
-    constructor(json: JSONObject) {
-        this.url = json.optString("url",Constants.instance.EMPTY_STRING)
-        this.width = json.optInt("width")
-        this.height = json.optInt("height")
-    }
+class ThumbnailsSettings(json: JSONObject) : Parcelable {
+    var url: String = json.optString("url",Constants.EMPTY_STRING)
+    var width: Int = json.optInt("width")
+    var height: Int = json.optInt("height")
 
     override fun describeContents(): Int {
         return 0

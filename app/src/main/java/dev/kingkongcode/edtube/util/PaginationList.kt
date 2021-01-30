@@ -13,7 +13,7 @@ class PaginationList {
         }
 
         fun filterPage(listItemActivities: ArrayList<dev.kingkongcode.edtube.model.PlaylistItem>, currentPage: Int) : ArrayList<dev.kingkongcode.edtube.model.PlaylistItem> {
-            var filterList = ArrayList<dev.kingkongcode.edtube.model.PlaylistItem>()
+            val filterList = ArrayList<dev.kingkongcode.edtube.model.PlaylistItem>()
             //val maxIndex = listItems.size - 1
             val nbrOfItemsPerPage = 4.0
 

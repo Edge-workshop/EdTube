@@ -3,48 +3,45 @@ package dev.kingkongcode.edtube.controller
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
-import android.widget.ImageButton
 import android.widget.Toast
 import com.google.android.youtube.player.YouTubeBaseActivity
 import com.google.android.youtube.player.YouTubeInitializationResult
 import com.google.android.youtube.player.YouTubePlayer
-import com.google.android.youtube.player.YouTubePlayerView
 import dev.kingkongcode.edtube.R
+import dev.kingkongcode.edtube.databinding.ActivityVideoViewBinding
 import dev.kingkongcode.edtube.server.Config
 import dev.kingkongcode.edtube.util.HideSystemUi
 
-private const val TAG = "VideoViewActivity"
-
 class VideoViewActivity : YouTubeBaseActivity() {
-    private lateinit var btnBack: ImageButton
+    private lateinit var binding: ActivityVideoViewBinding
 
-    private lateinit var ytYoutubePlayer: YouTubePlayerView
     private lateinit var onInitializedListener: YouTubePlayer.OnInitializedListener
     private var youtubeVideoID: String? = null
     private var allVideoIDStr: ArrayList<String>? = null
 
+    private companion object {
+        private const val TAG = "VideoViewActivity"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_video_view)
+        binding = ActivityVideoViewBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         Log.i(TAG,"onCreate is called")
+    }
+
+    override fun onStart() {
+        super.onStart()
         //Code section Full screen
-        HideSystemUi.hideSystemUi(this)
+        HideSystemUi.hideSystemUi(this@VideoViewActivity)
+        getUserData()
+    }
 
+    override fun onResume() {
+        super.onResume()
         //Back button
-        btnBack = findViewById(R.id.btnBack)
-        btnBack.setOnClickListener { onBackPressed() }
-        //YouTube player view
-        ytYoutubePlayer = findViewById(R.id.ytYoutubePlayer)
-
-        val extras: Bundle? = intent.extras
-        if (extras != null) {
-            //Code to retrieve youtubeVideoID
-            youtubeVideoID = extras.getString("youtubeVideoID")
-            //to retrieve list of string id
-            allVideoIDStr = extras.getStringArrayList("playAll")
-        }
-
-        initiate()
+        binding.btnBack.setOnClickListener { onBackPressed() }
+        settingYoutubePlayer()
     }
 
     @Override
@@ -52,9 +49,19 @@ class VideoViewActivity : YouTubeBaseActivity() {
         super.onConfigurationChanged(newConfig)
     }
 
-    private fun initiate() {
-        Log.i(TAG, "Function initiate is called")
+    private fun getUserData() {
+        Log.i(TAG, "Function getUserData() is called")
+        val extras: Bundle? = intent.extras
+        if (extras != null) {
+            //Code to retrieve youtubeVideoID
+            youtubeVideoID = extras.getString("youtubeVideoID")
+            //to retrieve list of string id
+            allVideoIDStr = extras.getStringArrayList("playAll")
+        }
+    }
 
+    private fun settingYoutubePlayer() {
+        Log.i(TAG, "Function settingYoutubePlayer() is called")
         val playbackEventListener = object: YouTubePlayer.PlaybackEventListener {
             override fun onSeekTo(p0: Int) {
             }
@@ -115,6 +122,6 @@ class VideoViewActivity : YouTubeBaseActivity() {
                 ).show()
             }
         }
-        ytYoutubePlayer.initialize(Config.current.API_KEY, onInitializedListener)
+        binding.ytYoutubePlayer.initialize(Config.API_KEY, onInitializedListener)
     }
 }

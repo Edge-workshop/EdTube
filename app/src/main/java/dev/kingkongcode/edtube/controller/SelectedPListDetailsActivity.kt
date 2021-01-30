@@ -1,16 +1,13 @@
 package dev.kingkongcode.edtube.controller
 
-import android.content.Context
-import android.content.DialogInterface
+import android.annotation.SuppressLint
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,124 +15,139 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import dev.kingkongcode.edtube.R
+import dev.kingkongcode.edtube.databinding.ActivitySelectedPListDetailsBinding
 import dev.kingkongcode.edtube.model.ETUser
 import dev.kingkongcode.edtube.dialogs.MyCustomDialog
 import dev.kingkongcode.edtube.model.PlaylistItem
 import dev.kingkongcode.edtube.server.APIManager
 import dev.kingkongcode.edtube.util.BaseActivity
-import dev.kingkongcode.edtube.util.Constants
 import dev.kingkongcode.edtube.util.ConvertDurationIsoToString
-import java.time.Period
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.time.Duration
-
-private const val TAG = "SelectedPListDetails"
 
 class SelectedPListDetailsActivity : BaseActivity() {
-    private lateinit var progressBar: ProgressBar
-
-    private lateinit var mGoogleSignInClient : GoogleSignInClient
+    private lateinit var binding: ActivitySelectedPListDetailsBinding
     private lateinit var etUser: ETUser
-    private lateinit var ivProfilePic: ImageView
-
-    private lateinit var tvPlaylistTitle: TextView
-    private lateinit var tvNbrOfVideo: TextView
-    private lateinit var ibPlayAllBtn: ImageButton
-    private lateinit var ivSelectedThumbnail: ImageView
-    private lateinit var ivSinglePlay: ImageView
 
     private lateinit var youtubeVideoID: String
 
-    private lateinit var rvListVideo: RecyclerView
-    private lateinit var linearLayoutManager: LinearLayoutManager
     private var mPlayList = arrayListOf<PlaylistItem>()
-    private var tempPlayList = arrayListOf<PlaylistItem>()
     private lateinit var playlistAdapter: SelectedPListDetailsActivity.PlaylistAdapter
 
-    private lateinit var bottomNavigation: BottomNavigationView
+    /**to keep user in this activity after clicking no in LogOutDialog. But bottom navigation will go
+     * back on home item selected **/
+    private var isExiting = true
+
+    private companion object {
+        private const val TAG = "SelectedPListDetails"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_selected_p_list_details)
+        binding = ActivitySelectedPListDetailsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         Log.i(TAG,"onCreate is called")
 
-        //Progressbar
-        progressBar = findViewById(R.id.progressBar)
-        //Profile photo
-        ivProfilePic = findViewById(R.id.ivProfileAvatar)
-        //Main Selected List Title
-        tvPlaylistTitle = findViewById(R.id.tvPlaylistTitle)
-        //Number of video text
-        tvNbrOfVideo = findViewById(R.id.tvNbrOfVideo)
-        //Play all button
-        ibPlayAllBtn = findViewById(R.id.ibPlayBtn)
-        //Main selected thumbnail
-        ivSelectedThumbnail = findViewById(R.id.ivSelectedThumbnail)
-        //Single Play
-        ivSinglePlay = findViewById(R.id.ivSinglePlay)
-
-        //List of all video in selected list
-        rvListVideo = findViewById(R.id.rvListVideo)
-        linearLayoutManager = LinearLayoutManager(this)
-        rvListVideo.layoutManager = linearLayoutManager
-        //Bottom Navigation bar
-        bottomNavigation = findViewById(R.id.bottomNavigation)
-
-        initiate()
+        binding.progressBar.visibility = View.VISIBLE
+        settingPlaylistVideo()
+        retrieveAndDisplayUserData()
+        settingClickListener()
+        settingBottomNavigation()
     }
 
-    override fun onResume() {
-        super.onResume()
-        Log.i(TAG,"onResume is called")
-    }
-
-    private fun initiate() {
-        Log.i(TAG,"Function initiate is called")
-        progressBar.visibility = View.VISIBLE
-
-        //Code section initiate RecycleView and PlaylistAdapter
-        playlistAdapter = PlaylistAdapter(this@SelectedPListDetailsActivity, this.mPlayList)
-        rvListVideo.adapter = playlistAdapter
-
+    @SuppressLint("SetTextI18n")
+    private fun retrieveAndDisplayUserData() {
         var videoNbr: String
         val extras: Bundle? = intent.extras
-        if (extras != null) {
+        extras?.let { xtra ->
             //Getting user info
-            etUser = extras.getParcelable<ETUser>("ETUser")!!
+            etUser = xtra.getParcelable("ETUser")!!
             //Code to display the right String in user lang
             val completeStringTitle = if (Locale.getDefault().isO3Language == "eng") {
                 "${etUser.firstName}' s Playlist."
             } else "La Playlist à ${etUser.firstName}."
-            tvPlaylistTitle.text = completeStringTitle
+            binding.tvPlaylistTitle.text = completeStringTitle
 
-            //Code to retreive profile pic from google sign in or else default pic
+            //Code to retrieve profile pic from google sign in or else default pic
             Glide.with(this).load(etUser.userPhoto).
             diskCacheStrategy(DiskCacheStrategy.NONE).
-            error(R.drawable.profile_pic_na).into(ivProfilePic)
+            error(R.drawable.profile_pic_na).into(binding.ivProfilePic)
 
-            ivProfilePic.setOnClickListener {
-                Log.i(TAG,"User click on profil icon custom dialog show")
-                MyCustomDialog(etUser,this@SelectedPListDetailsActivity).show(supportFragmentManager,"MyCustomFragment")
+            binding.ivProfilePic.setOnClickListener {
+                Log.i(TAG,"User click on profile icon custom dialog show")
+                MyCustomDialog(etUser).show(supportFragmentManager,"MyCustomFragment")
             }
 
             //Retrieving user selected list id
             requestSelectedPList(extras.getString("selectedListID")!!)
-            videoNbr = extras.getString("videoNbr")!!
+            extras.getString("videoNbr")!!.also { videoNbr = it }
             val firstPartText = getString(R.string.number_of_video)
-            tvNbrOfVideo.text = firstPartText+"\t\t"+videoNbr
+            (firstPartText+"\t\t"+videoNbr).also { firstPart -> binding.tvNbrOfVideo.text = firstPart }
         }
+    }
 
+    private fun settingPlaylistVideo() {
+        //Code section initiate RecycleView and PlaylistAdapter
+        val linearLayoutManager = LinearLayoutManager(this@SelectedPListDetailsActivity)
+        binding.rvListVideo.layoutManager = linearLayoutManager
+        playlistAdapter = PlaylistAdapter(this.mPlayList)
+        binding.rvListVideo.adapter = playlistAdapter
+    }
+
+    private fun requestSelectedPList(selectedID: String) {
+        Log.i(TAG,"Function requestSelectedPList was called")
+        lateinit var tempPlayList: ArrayList<PlaylistItem>
+
+        APIManager.instance.requestSelectedPlaylistDetails(this@SelectedPListDetailsActivity, selectedID, null, completion = { error, selectedPList ->
+            Log.i(TAG,"APIManager requestSelectedPlaylistDetails response receive in activity")
+
+            error?.let { errorMsg -> Toast.makeText(this@SelectedPListDetailsActivity, errorMsg, Toast.LENGTH_SHORT).show() }
+
+            //Code section where we populate adapter with api response data
+            selectedPList?.let { xSelectedPList ->
+                tempPlayList = xSelectedPList.clone() as ArrayList<PlaylistItem>
+                val strVideoIdList = arrayListOf<String>()
+                for (videoStrId in tempPlayList ) {
+                    strVideoIdList.add(videoStrId.snippet.resourceId.videoId)
+                }
+
+                APIManager.instance.requestGetVideoDuration(this@SelectedPListDetailsActivity, strVideoIdList, completion = {error, durationVideoList ->
+                    error?.let { Toast.makeText(this@SelectedPListDetailsActivity, it, Toast.LENGTH_LONG).show() }
+
+                    durationVideoList?.let {
+                        //Code section where we get list from API server and to match video id from user selected list from first API call
+                        for (durationPairObj in it) {
+                            for (videoStrId in tempPlayList) {
+                                if (durationPairObj.first == videoStrId.snippet.resourceId.videoId) {
+                                    videoStrId.duration = durationPairObj.second
+                                }
+                            }
+                        }
+
+                        playlistAdapter.update(tempPlayList)
+                        //Code section where we initiate first thumbnails and store youtube video id that is link with thumbnail
+                        if (tempPlayList[0].snippet.thumbnails.high.url.isNotEmpty()){
+                            Glide.with(this@SelectedPListDetailsActivity).load(tempPlayList[0].snippet.thumbnails.high.url).into(binding.ivSelectedThumbnail)
+                        }
+
+                        binding.ivSinglePlay.visibility = View.VISIBLE
+                        youtubeVideoID = tempPlayList[0].snippet.resourceId.videoId
+                    }
+                })
+            }
+        })
+    }
+
+    private fun settingClickListener() {
         //Code section when user click into main thumbnail image
-        ivSelectedThumbnail.setOnClickListener {
+        binding.ivSelectedThumbnail.setOnClickListener {
             val intent = Intent(this@SelectedPListDetailsActivity,VideoViewActivity::class.java)
             intent.putExtra("youtubeVideoID",youtubeVideoID)
             startActivity(intent)
         }
 
-        ibPlayAllBtn.setOnClickListener {
+        binding.ibPlayAllBtn.setOnClickListener {
             val allVideoId = arrayListOf<String>()
             for (videoId in this.mPlayList){
                 allVideoId.add(videoId.snippet.resourceId.videoId)
@@ -145,14 +157,19 @@ class SelectedPListDetailsActivity : BaseActivity() {
             intent.putExtra("playAll",allVideoId)
             startActivity(intent)
         }
+    }
 
+    private fun settingBottomNavigation() {
         //Code section for Bottom Navigation menu item
-        bottomNavigation.setOnNavigationItemSelectedListener {
+        binding.bottomNavigation.setOnNavigationItemSelectedListener {
             when(it.itemId) {
                 R.id.home_page_menu_home -> {
-                    val intent = Intent(this@SelectedPListDetailsActivity,HomePageActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                    if (isExiting) {
+                        val intent = Intent(this@SelectedPListDetailsActivity,HomePageActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    } else isExiting = true
+
                     true
                 }
 
@@ -173,93 +190,45 @@ class SelectedPListDetailsActivity : BaseActivity() {
         }
     }
 
-    private fun requestSelectedPList(selectedID: String) {
-        Log.i(TAG,"Function requestSelectedPList was called")
-
-        APIManager.instance.requestSelectedPlaylistDetails(this@SelectedPListDetailsActivity,selectedID, null, completion = { error, selectedPList ->
-            Log.i(TAG,"APIManager requestSelectedPlaylistDetails response receive in activity")
-
-            error?.let { Toast.makeText(this@SelectedPListDetailsActivity,error,Toast.LENGTH_SHORT).show() }
-
-            //Code section where we populate adapter with api response data
-            selectedPList?.let { xSelectedPList ->
-                tempPlayList = xSelectedPList.clone() as ArrayList<PlaylistItem>
-                var strVideoIdList = arrayListOf<String>()
-                for (videoStrId in tempPlayList ) {
-                    strVideoIdList.add(videoStrId.snippet.resourceId.videoId)
-                }
-
-                APIManager.instance.requestGetVideoDuration(this@SelectedPListDetailsActivity, strVideoIdList, completion = {error, durationVideoList ->
-                    error?.let { Toast.makeText(this@SelectedPListDetailsActivity, it, Toast.LENGTH_LONG).show() }
-
-                    durationVideoList?.let {
-                        //Code section where we get list from API server and to match video id from user selected list from first API call
-                        for (durationPairObj in it) {
-                            for (videoStrId in tempPlayList) {
-                                if (durationPairObj.first == videoStrId.snippet.resourceId.videoId) {
-                                    videoStrId.duration = durationPairObj.second
-                                }
-                            }
-                        }
-
-                        this.mPlayList.clear()
-                        this.mPlayList.addAll(tempPlayList)
-                        rvListVideo.adapter?.notifyDataSetChanged()
-                        //Code section where we initiate first thumbnails and store youtube video id that is link with thumbnail
-                        if (!tempPlayList[0].snippet.thumbnails.high.url.isNullOrEmpty()){
-                            Glide.with(this@SelectedPListDetailsActivity).load(tempPlayList[0].snippet.thumbnails.high.url).into(ivSelectedThumbnail)
-                        }
-
-                        ivSinglePlay.visibility = View.VISIBLE
-                        youtubeVideoID = tempPlayList[0].snippet.resourceId.videoId
-                    }
-                })
-            }
-        })
-    }
-
     private fun showLogOutDialog() {
         // build alert dialog
         val dialogBuilder = AlertDialog.Builder(this)
-        // set message of alert dialog
-        dialogBuilder.setMessage("Do you want to close this application ?")
-            // if the dialog is cancelable
-            .setCancelable(false)
-            // positive button text and action
-            .setPositiveButton("YES", DialogInterface.OnClickListener {
-                    dialog, id -> signOut()
-            })
-            // negative button text and action
-            .setNegativeButton("NO", DialogInterface.OnClickListener {
-                    dialog, id -> dialog.cancel()
-                bottomNavigation.selectedItemId = R.id.home_page_menu_home
-            })
-
-        // create dialog box
-        val alert = dialogBuilder.create()
-        // set title for alert dialog box
-        alert.setTitle("EdTube")
-        // show alert dialog
-        alert.show()
+        dialogBuilder.apply {
+            // set message of alert dialog
+            dialogBuilder.setMessage("Do you want to close this application ?")
+            setCancelable(false)
+            setPositiveButton("YES") { dialog, id ->
+                signOut()
+            }
+            setNegativeButton("NO") { dialog, id ->
+                isExiting = false
+                binding.bottomNavigation.selectedItemId = R.id.home_page_menu_home
+                dialog.cancel()
+            }
+            create()
+            setTitle("EdTube")
+            show()
+        }
     }
 
     private fun signOut() {
-        Log.i(TAG,"Funtion signOut was called")
+        Log.i(TAG,"Function signOut was called")
+        lateinit var mGoogleSignInClient : GoogleSignInClient
         mGoogleSignInClient.signOut()
             .addOnCompleteListener(this) {
-                Toast.makeText(this, getString(R.string.signOut_succes), Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.signOut_success), Toast.LENGTH_LONG).show()
                 finish()
             }
     }
 
-    private inner class PlaylistAdapter(private val mContext: Context, private var dataSet: List<PlaylistItem>) : RecyclerView.Adapter<SelectedPListDetailsActivity.PlaylistAdapter.VideoViewHolder>(), View.OnClickListener {
+    private inner class PlaylistAdapter(private var dataSet: MutableList<PlaylistItem>) : RecyclerView.Adapter<SelectedPListDetailsActivity.PlaylistAdapter.VideoViewHolder>() {
         private var oldIndexSelected = 0
         private var isJustStarted = true
 
         private inner class VideoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            var tvTrackNumber = itemView.findViewById<TextView>(R.id.tvTrackNumber)
-            var tvTrackTitle = itemView.findViewById<TextView>(R.id.tvTrackTitle)
-            var tvDuration = itemView.findViewById<TextView>(R.id.tvDuration)
+            var tvTrackNumber: TextView = itemView.findViewById(R.id.tvTrackNumber)
+            var tvTrackTitle: TextView = itemView.findViewById(R.id.tvTrackTitle)
+            var tvDuration: TextView = itemView.findViewById(R.id.tvDuration)
 
             fun bind(video: PlaylistItem, position: Int) {
                 tvTrackNumber.text = (position + 1).toString()
@@ -269,20 +238,20 @@ class SelectedPListDetailsActivity : BaseActivity() {
         }
 
         @Override
-        override fun onClick(v: View) {
-        }
-
-        @Override
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) : PlaylistAdapter.VideoViewHolder {
             val layout =  R.layout.video_details_row
-            val view = LayoutInflater.from(mContext).inflate(layout, parent, false)
-            progressBar.visibility = View.INVISIBLE
+            val view = LayoutInflater.from(parent.context).inflate(layout, parent, false)
+            binding.progressBar.visibility = View.INVISIBLE
             return VideoViewHolder(view)
         }
 
         @Override
-        override fun getItemCount(): Int {
-            return dataSet.size
+        override fun getItemCount() = dataSet.size
+
+        fun update(updatedList: MutableList<PlaylistItem>) {
+            dataSet.clear()
+            dataSet.addAll(updatedList)
+            notifyDataSetChanged()
         }
 
         @Override
@@ -305,12 +274,12 @@ class SelectedPListDetailsActivity : BaseActivity() {
                 Log.i(TAG,"User click on specific playlist title: ${video.snippet.title} row position: $position")
 
                 //Code section to send image thumbnails to main view when user click on specific row
-                if (!video.snippet.thumbnails.high.url.isNullOrEmpty()) {
-                    Glide.with(mContext).load(video.snippet.thumbnails.high.url).into(ivSelectedThumbnail)
+                if (video.snippet.thumbnails.high.url.isNotEmpty()) {
+                    Glide.with(holder.itemView.context).load(video.snippet.thumbnails.high.url).into(binding.ivSelectedThumbnail)
                     youtubeVideoID = video.snippet.resourceId.videoId
                 }
 
-                //Code section to reset proper value in dataset in adapter
+                //Code section to reset proper value in data set in adapter
                 dataSet[oldIndexSelected].isVideoSelected = false
                 dataSet[position].isVideoSelected = true
                 oldIndexSelected = position

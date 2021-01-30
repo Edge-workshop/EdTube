@@ -43,11 +43,11 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/profilIconBgColor"
+                    android:background="@color/profileIconBgColor"
                     >
 
                     <ImageView
-                        android:id="@+id/ivProfileAvatar"
+                        android:id="@+id/ivProfilePic"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -127,7 +127,7 @@
         android:layout_height="wrap_content"
         tools:text="EDGE'S PLAYLIST"
         android:textColor="@color/white"
-        android:textSize="28dp"
+        android:textSize="28sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarMenu"
@@ -145,12 +145,13 @@
         />
 
     <ImageButton
-        android:id="@+id/ibPlayBtn"
+        android:id="@+id/ibPlayAllBtn"
         android:layout_width="@dimen/dimens_40"
         android:layout_height="@dimen/dimens_40"
         android:src="@drawable/play_circle"
         android:background="@android:color/transparent"
         android:scaleType="fitXY"
+        android:contentDescription="@string/play_all_btn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarMenu"
@@ -161,17 +162,18 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="@+id/ibPlayBtn"
-        app:layout_constraintEnd_toEndOf="@+id/ibPlayBtn"
-        app:layout_constraintTop_toBottomOf="@+id/ibPlayBtn"
+        app:layout_constraintStart_toStartOf="@+id/ibPlayAllBtn"
+        app:layout_constraintEnd_toEndOf="@+id/ibPlayAllBtn"
+        app:layout_constraintTop_toBottomOf="@+id/ibPlayAllBtn"
         android:text="@string/play_all"
-        android:textSize="@dimen/dimens_10"/>
+        android:textSize="@dimen/dimens_10_sp"/>
 
     <ImageView
         android:id="@+id/ivSelectedThumbnail"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
+        android:contentDescription="@string/video_thumbnail"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/glTopThumbnail"
@@ -184,6 +186,7 @@
         android:src="@drawable/play_circle_outline"
         android:alpha=".6"
         android:visibility="invisible"
+        android:contentDescription="@string/video_thumbnail_btn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/glTopThumbnail"

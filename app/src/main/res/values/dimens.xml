@@ -3,21 +3,19 @@
 
     <!--#-->
     <dimen name="dimens_4">4dp</dimen>
-    <dimen name="dimens_5">5dp</dimen>
     <dimen name="dimens_8">8dp</dimen>
     <dimen name="dimens_10">10dp</dimen>
+    <dimen name="dimens_10_sp">10sp</dimen>
     <dimen name="dimens_16">16dp</dimen>
     <dimen name="dimens_32">32dp</dimen>
     <dimen name="dimens_40">40dp</dimen>
-    <dimen name="dimens_48">48dp</dimen>
     <dimen name="dimens_56">56dp</dimen>
-    <dimen name="dimens_64">64dp</dimen>
 
 
     <!--P-->
-    <dimen name="playlist_cell_main_title">15sp</dimen>
+    <dimen name="playlist_cell_main_title">13sp</dimen>
     <dimen name="playlist_text_margin">8dp</dimen>
-    <dimen name="playlist_sec_text_size">13sp</dimen>
+    <dimen name="playlist_sec_text_size">11sp</dimen>
 
 
 </resources>

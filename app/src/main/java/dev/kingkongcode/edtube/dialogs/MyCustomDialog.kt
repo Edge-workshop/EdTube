@@ -1,6 +1,5 @@
 package dev.kingkongcode.edtube.dialogs
 
-import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,13 +13,13 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.model.ETUser
 
-class MyCustomDialog(private val user: ETUser, private val activity: Activity) : DialogFragment() {
+class MyCustomDialog(private val user: ETUser) : DialogFragment() {
 
     private inner class ViewHolder {
         lateinit var ivProfilePic: ImageView
         lateinit var tvFirstName: TextView
         lateinit var tvLastName: TextView
-        lateinit var tvemail: TextView
+        lateinit var tvEmail: TextView
         lateinit var btnOk: Button
     }
 
@@ -30,25 +29,27 @@ class MyCustomDialog(private val user: ETUser, private val activity: Activity) :
         savedInstanceState: Bundle?
     ): View? {
         //getDialog()!!.getWindow()?.setBackgroundDrawableResource(R.drawable.round_corner)
-        var viewHolder = ViewHolder()
-        var convertView = inflater.inflate(R.layout.profil_dialog, container, false)
-        viewHolder.ivProfilePic = convertView.findViewById(R.id.ivProfileAvatar)
-        viewHolder.tvFirstName = convertView.findViewById(R.id.tvFirstName)
-        viewHolder.tvLastName = convertView.findViewById(R.id.tvLastName)
-        viewHolder.tvemail = convertView.findViewById(R.id.tvemail)
-        viewHolder.btnOk = convertView.findViewById(R.id.btnOK)
+        val viewHolder = ViewHolder()
+        val convertView = inflater.inflate(R.layout.profil_dialog, container, false)
 
-        //Code to retrieve profile pic from google sign in or else default pic
-        Glide.with(this).load(user.userPhoto).
-        diskCacheStrategy(DiskCacheStrategy.NONE).
-        error(R.drawable.profile_pic_na).into(viewHolder.ivProfilePic)
+        viewHolder.apply {
+            ivProfilePic = convertView.findViewById(R.id.ivProfileAvatar)
+            tvFirstName = convertView.findViewById(R.id.tvFirstName)
+            tvLastName = convertView.findViewById(R.id.tvLastName)
+            tvEmail = convertView.findViewById(R.id.tvEmail)
+            btnOk = convertView.findViewById(R.id.btnOK)
 
-        viewHolder.tvFirstName.text = user.firstName
-        viewHolder.tvLastName.text = user.lastName
-        viewHolder.tvemail.text = user.email
+            //Code to retrieve profile pic from google sign in or else default pic
+            Glide.with(this@MyCustomDialog).load(user.userPhoto).
+            diskCacheStrategy(DiskCacheStrategy.NONE).
+            error(R.drawable.profile_pic_na).into(ivProfilePic)
+            tvFirstName.text = user.firstName
+            tvLastName.text = user.lastName
+            tvEmail.text = user.email
 
-        viewHolder.btnOk.setOnClickListener {
-            dismiss()
+            btnOk.setOnClickListener {
+                dismiss()
+            }
         }
 
         return convertView
