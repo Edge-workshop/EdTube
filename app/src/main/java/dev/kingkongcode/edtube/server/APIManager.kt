@@ -24,10 +24,6 @@ class APIManager {
         private const val SHARED_PROFILE = "keystoragesaved"
     }
 
-//    private fun getBaseURL(): String {
-//        return Config.current.OAUTH2_URL
-//    }
-
     private fun getRegularHeaders(): Map<String, String> {
         val headers = HashMap<String, String>()
 //        headers["language"] = Locale.getDefault().displayLanguage

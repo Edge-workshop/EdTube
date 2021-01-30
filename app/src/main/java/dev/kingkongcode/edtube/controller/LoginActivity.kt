@@ -39,23 +39,22 @@ class LoginActivity : BaseActivity() {
         Log.i(TAG, "onCreate is called")
 
         initGoogleSignIn()
+    }
+
+    override fun onStart() {
+        super.onStart()
         //obligatory check to make sure we're on 21+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val fade = Fade()
             window.enterTransition = fade
             window.exitTransition = fade
         }
-
-        settingAllButtons()
+        showElementOnScreen()
     }
 
-    override fun onStart() {
-        super.onStart()
-        showElementOnScreen()
-        //Log.i(TAG, "onStart is called to check if user is already sign in with google auth")
-        //this section of code is to check if user is already sign in
-        //val account = GoogleSignIn.getLastSignedInAccount(this)
-        //updateUI(account) fun to start an intent to next view
+    override fun onResume() {
+        super.onResume()
+        settingAllButtons()
     }
 
     private fun initGoogleSignIn() {

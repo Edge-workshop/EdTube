@@ -50,9 +50,13 @@ class SearchVideoActivity : BaseActivity() {
         binding.rvYTVideoList.adapter = playListAdapter
     }
 
+    override fun onStart() {
+        super.onStart()
+        hideKeyboard()
+    }
+
     override fun onResume() {
         super.onResume()
-        hideKeyboard()
         getUserDataAndSetProfileIcon()
         settingSearchBar()
         settingBottomNavigation()

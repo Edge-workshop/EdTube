@@ -29,8 +29,8 @@ class MainActivity : BaseActivity() {
         Log.i(TAG, "onCreate is called")
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         titleAnimation()
         setAutomaticTransition()
     }

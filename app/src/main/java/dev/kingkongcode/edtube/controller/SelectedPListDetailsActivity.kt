@@ -49,9 +49,17 @@ class SelectedPListDetailsActivity : BaseActivity() {
         setContentView(binding.root)
         Log.i(TAG,"onCreate is called")
 
-        binding.progressBar.visibility = View.VISIBLE
         settingPlaylistVideo()
         retrieveAndDisplayUserData()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        binding.progressBar.visibility = View.VISIBLE
+    }
+
+    override fun onResume() {
+        super.onResume()
         settingClickListener()
         settingBottomNavigation()
     }

@@ -61,31 +61,6 @@ class HomePageActivity : BaseActivity() {
         setBottomNavigation()
     }
 
-    /***
-     * Top menu
-     * */
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.home_page_menu, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-//        val menuLayout: MenuItem = menu!!.findItem(R.id.home_page_menu_profile_icon)
-//        val rootView: View = menuLayout.actionView
-//
-//        val profileIV: ImageView = rootView.findViewById(R.id.ivProfileAvatar)
-//
-//        //Code to retrieve profile pic from google sign in or else default pic
-//        Glide.with(this).load(userPhoto).
-//            diskCacheStrategy(DiskCacheStrategy.NONE).
-//            error(R.drawable.profile_pic_na).into(profileIV)
-        return super.onPrepareOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return true
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.i(TAG, "onActivityResult requestCode= $requestCode and resultCode= $resultCode")
@@ -136,8 +111,8 @@ class HomePageActivity : BaseActivity() {
         dialogBuilder.apply {
             setMessage("Do you want to close this application ?")
             setCancelable(false)
-            setPositiveButton("YES") {
-                    _, _ -> signOut()
+            setPositiveButton("YES") { _, _ ->
+                signOut()
             }
 
             setNegativeButton("NO") { dialog, _ ->
@@ -172,9 +147,9 @@ class HomePageActivity : BaseActivity() {
             userPlaylist?.let {
                 userPList = it.items
                 //Code section to display user current page and max page
-                val (a, b) = PaginationList.showNbrPage(userPList, currentPage)
-                binding.pageNbr.text = a
-                maxPage = b
+                val (mCurrentPage, mTotalPages) = PaginationList.showNbrPage(userPList, currentPage)
+                binding.pageNbr.text = mCurrentPage
+                maxPage = mTotalPages
 
                 playlistAdapter.update(PaginationList.filterPage(userPList, currentPage))
             }
@@ -187,9 +162,9 @@ class HomePageActivity : BaseActivity() {
             if (currentPage > 1) {
                 currentPage -= 1
                 //Code section to display user current page and max page
-                val (a, b) = PaginationList.showNbrPage(userPList, currentPage)
-                binding.pageNbr.text = a
-                maxPage = b
+                val (mCurrentPage, mTotalPages) = PaginationList.showNbrPage(userPList, currentPage)
+                binding.pageNbr.text = mCurrentPage
+                maxPage = mTotalPages
                 //Code section to select right items on the list
                 val filterUserList = PaginationList.filterPage(userPList, currentPage)
                 playlistAdapter.update(filterUserList)
@@ -201,9 +176,9 @@ class HomePageActivity : BaseActivity() {
             if (currentPage < maxPage) {
                 currentPage += 1
                 //Code section to display user current page and max page
-                val (a, b) = PaginationList.showNbrPage(userPList, currentPage)
-                binding.pageNbr.text = a
-                maxPage = b
+                val (mCurrentPage, mTotalPages) = PaginationList.showNbrPage(userPList, currentPage)
+                binding.pageNbr.text = mCurrentPage
+                maxPage = mTotalPages
                 //Code section to display user current page and max page
                 val filterUserList = PaginationList.filterPage(userPList, currentPage)
                 playlistAdapter.update(filterUserList)
@@ -258,8 +233,6 @@ class HomePageActivity : BaseActivity() {
         }
     }
 
-
-
     inner class PlaylistAdapter(private val dataSet: MutableList<PlaylistItem>) : RecyclerView.Adapter<HomePageActivity.PlaylistAdapter.ViewHolder>() {
 
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -278,7 +251,6 @@ class HomePageActivity : BaseActivity() {
                     Glide.with(itemView.context).load(playlistItem.snippet.thumbnails.high.url).into(ivThumbnail)
                 }
             }
-
         }
 
         override fun getItemCount() = dataSet.size
@@ -306,6 +278,5 @@ class HomePageActivity : BaseActivity() {
             dataSet.addAll(updateList)
             notifyDataSetChanged()
         }
-
     }
 }

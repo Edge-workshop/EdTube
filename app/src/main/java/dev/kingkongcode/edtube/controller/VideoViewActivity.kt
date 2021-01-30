@@ -28,13 +28,13 @@ class VideoViewActivity : YouTubeBaseActivity() {
         binding = ActivityVideoViewBinding.inflate(layoutInflater)
         setContentView(binding.root)
         Log.i(TAG,"onCreate is called")
+        getUserData()
     }
 
     override fun onStart() {
         super.onStart()
         //Code section Full screen
         HideSystemUi.hideSystemUi(this@VideoViewActivity)
-        getUserData()
     }
 
     override fun onResume() {
