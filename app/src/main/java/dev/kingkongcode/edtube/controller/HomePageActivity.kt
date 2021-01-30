@@ -57,6 +57,10 @@ class HomePageActivity : BaseActivity() {
         setUserProfile()
         settingVideoGrid()
         reqListApi()
+    }
+
+    override fun onResume() {
+        super.onResume()
         setPreviousAndNextPageButton()
         setBottomNavigation()
     }
