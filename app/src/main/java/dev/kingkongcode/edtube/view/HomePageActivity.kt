@@ -1,4 +1,4 @@
-package dev.kingkongcode.edtube.controller
+package dev.kingkongcode.edtube.view
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -23,9 +23,9 @@ import dev.kingkongcode.edtube.databinding.ActivityHomePageBinding
 import dev.kingkongcode.edtube.model.ETUser
 import dev.kingkongcode.edtube.dialogs.MyCustomDialog
 import dev.kingkongcode.edtube.model.PlaylistItem
-import dev.kingkongcode.edtube.server.APIManager
-import dev.kingkongcode.edtube.util.BaseActivity
-import dev.kingkongcode.edtube.util.PaginationList
+import dev.kingkongcode.edtube.app.server.APIManager
+import dev.kingkongcode.edtube.app.BaseActivity
+import dev.kingkongcode.edtube.app.PaginationList
 import java.util.*
 
 class HomePageActivity : BaseActivity() {
@@ -274,8 +274,8 @@ class HomePageActivity : BaseActivity() {
                 val videoNbr = playlistItem.detailsXItem.itemCountStr
                 (nbrOfVideoStr+"\t\t"+videoNbr).also { tvNbrOfVideo.text = it }
 
-                if (playlistItem.snippet.thumbnails.high.url.isNotEmpty()){
-                    Glide.with(itemView.context).load(playlistItem.snippet.thumbnails.high.url).into(ivThumbnail)
+                if (playlistItem.snippet.thumbnails?.high?.url!!.isNotEmpty()){
+                    Glide.with(itemView.context).load(playlistItem.snippet.thumbnails!!.high!!.url).into(ivThumbnail)
                 }
             }
 

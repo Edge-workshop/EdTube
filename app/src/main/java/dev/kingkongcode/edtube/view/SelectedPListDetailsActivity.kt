@@ -1,4 +1,4 @@
-package dev.kingkongcode.edtube.controller
+package dev.kingkongcode.edtube.view
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -20,9 +20,9 @@ import dev.kingkongcode.edtube.databinding.ActivitySelectedPListDetailsBinding
 import dev.kingkongcode.edtube.model.ETUser
 import dev.kingkongcode.edtube.dialogs.MyCustomDialog
 import dev.kingkongcode.edtube.model.PlaylistItem
-import dev.kingkongcode.edtube.server.APIManager
-import dev.kingkongcode.edtube.util.BaseActivity
-import dev.kingkongcode.edtube.util.ConvertDurationIsoToString
+import dev.kingkongcode.edtube.app.server.APIManager
+import dev.kingkongcode.edtube.app.BaseActivity
+import dev.kingkongcode.edtube.app.ConvertDurationIsoToString
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -109,17 +109,17 @@ class SelectedPListDetailsActivity : BaseActivity() {
                 tempPlayList = xSelectedPList.clone() as ArrayList<PlaylistItem>
                 val strVideoIdList = arrayListOf<String>()
                 for (videoStrId in tempPlayList ) {
-                    strVideoIdList.add(videoStrId.snippet.resourceId.videoId)
+                    strVideoIdList.add(videoStrId.snippet.resourceId?.videoId!!)
                 }
 
-                APIManager.instance.requestGetVideoDuration(this@SelectedPListDetailsActivity, strVideoIdList, completion = {error, durationVideoList ->
+                APIManager.instance.requestGetVideoDuration(this@SelectedPListDetailsActivity, strVideoIdList, completion = { error, durationVideoList ->
                     error?.let { Toast.makeText(this@SelectedPListDetailsActivity, it, Toast.LENGTH_LONG).show() }
 
                     durationVideoList?.let {
                         //Code section where we get list from API server and to match video id from user selected list from first API call
                         for (durationPairObj in it) {
                             for (videoStrId in tempPlayList) {
-                                if (durationPairObj.first == videoStrId.snippet.resourceId.videoId) {
+                                if (durationPairObj.first == videoStrId.snippet.resourceId?.videoId) {
                                     videoStrId.duration = durationPairObj.second
                                 }
                             }
@@ -127,12 +127,12 @@ class SelectedPListDetailsActivity : BaseActivity() {
 
                         playlistAdapter.update(tempPlayList)
                         //Code section where we initiate first thumbnails and store youtube video id that is link with thumbnail
-                        if (tempPlayList[0].snippet.thumbnails.high.url.isNotEmpty()){
-                            Glide.with(this@SelectedPListDetailsActivity).load(tempPlayList[0].snippet.thumbnails.high.url).into(binding.ivSelectedThumbnail)
+                        if (tempPlayList[0].snippet.thumbnails?.high?.url!!.isNotEmpty()){
+                            Glide.with(this@SelectedPListDetailsActivity).load(tempPlayList[0].snippet.thumbnails?.high?.url).into(binding.ivSelectedThumbnail)
                         }
 
                         binding.ivSinglePlay.visibility = View.VISIBLE
-                        youtubeVideoID = tempPlayList[0].snippet.resourceId.videoId
+                        youtubeVideoID = tempPlayList[0].snippet.resourceId?.videoId!!
                     }
                 })
             }
@@ -150,7 +150,7 @@ class SelectedPListDetailsActivity : BaseActivity() {
         binding.ibPlayAllBtn.setOnClickListener {
             val allVideoId = arrayListOf<String>()
             for (videoId in this.mPlayList){
-                allVideoId.add(videoId.snippet.resourceId.videoId)
+                allVideoId.add(videoId.snippet.resourceId?.videoId!!)
             }
 
             val intent = Intent(this@SelectedPListDetailsActivity,VideoViewActivity::class.java)
@@ -274,9 +274,9 @@ class SelectedPListDetailsActivity : BaseActivity() {
                 Log.i(TAG,"User click on specific playlist title: ${video.snippet.title} row position: $position")
 
                 //Code section to send image thumbnails to main view when user click on specific row
-                if (video.snippet.thumbnails.high.url.isNotEmpty()) {
-                    Glide.with(holder.itemView.context).load(video.snippet.thumbnails.high.url).into(binding.ivSelectedThumbnail)
-                    youtubeVideoID = video.snippet.resourceId.videoId
+                if (video.snippet.thumbnails?.high?.url!!.isNotEmpty()) {
+                    Glide.with(holder.itemView.context).load(video.snippet.thumbnails?.high?.url).into(binding.ivSelectedThumbnail)
+                    youtubeVideoID = video.snippet.resourceId?.videoId!!
                 }
 
                 //Code section to reset proper value in data set in adapter

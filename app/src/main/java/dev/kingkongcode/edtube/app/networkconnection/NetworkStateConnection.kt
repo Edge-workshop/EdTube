@@ -1,4 +1,4 @@
-package dev.kingkongcode.edtube.util.network
+package dev.kingkongcode.edtube.app.networkconnection
 
 import android.app.Dialog
 import android.content.BroadcastReceiver

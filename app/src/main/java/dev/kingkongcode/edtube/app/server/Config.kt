@@ -1,10 +1,15 @@
-package dev.kingkongcode.edtube.server
+package dev.kingkongcode.edtube.app.server
 
 class Config {
     companion object{
-        const val CLIENT_ID = ""
-        const val CLIENT_SECRET = ""
-        const val API_KEY = ""
+//        const val CLIENT_ID = ""
+//        const val CLIENT_SECRET = ""
+//        const val API_KEY = ""
+
+        const val CLIENT_ID = "1033471762786-mps5q8anslk0aj5ojbujgc3183jgon8j.apps.googleusercontent.com"
+        const val CLIENT_SECRET = "3YT2hRfVA8U7pSXWCGyc6LZv"
+        const val API_KEY = "AIzaSyA6okESac-Fhdlx6yqRG5QkSKswXxBgh5Y"
+
 
         /**
          * Youtube

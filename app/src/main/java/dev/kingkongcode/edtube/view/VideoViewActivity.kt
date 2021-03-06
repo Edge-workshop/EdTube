@@ -1,4 +1,4 @@
-package dev.kingkongcode.edtube.controller
+package dev.kingkongcode.edtube.view
 
 import android.content.res.Configuration
 import android.os.Bundle
@@ -9,8 +9,8 @@ import com.google.android.youtube.player.YouTubeInitializationResult
 import com.google.android.youtube.player.YouTubePlayer
 import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.databinding.ActivityVideoViewBinding
-import dev.kingkongcode.edtube.server.Config
-import dev.kingkongcode.edtube.util.HideSystemUi
+import dev.kingkongcode.edtube.app.server.Config
+import dev.kingkongcode.edtube.app.HideSystemUi
 
 class VideoViewActivity : YouTubeBaseActivity() {
     private lateinit var binding: ActivityVideoViewBinding

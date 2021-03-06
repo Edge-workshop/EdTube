@@ -4,36 +4,35 @@ import android.os.Parcel
 import android.os.Parcelable
 import org.json.JSONObject
 
-class Thumbnails : Parcelable {
-    lateinit var default: ThumbnailsSettings
-    lateinit var medium: ThumbnailsSettings
-    lateinit var high: ThumbnailsSettings
-    lateinit var standard: ThumbnailsSettings
+data class Thumbnails(
+    var default: ThumbnailsSettings?,
+    var medium: ThumbnailsSettings?,
+    var high: ThumbnailsSettings?,
+    var standard: ThumbnailsSettings?
+) : Parcelable {
 
-    constructor(jsonObject: JSONObject) {
+
+    constructor(jsonObject: JSONObject) : this (
         jsonObject.optJSONObject("default")?.let {
-            this.default= ThumbnailsSettings(it)
-        }
-
+            ThumbnailsSettings(it)
+        },
         jsonObject.optJSONObject("medium")?.let {
-            this.medium= ThumbnailsSettings(it)
-        }
-
+            ThumbnailsSettings(it)
+        },
         jsonObject.optJSONObject("high")?.let {
-            this.high= ThumbnailsSettings(it)
-        }
-
+            ThumbnailsSettings(it)
+        },
         jsonObject.optJSONObject("standard")?.let {
-            this.standard= ThumbnailsSettings(it)
+            ThumbnailsSettings(it)
         }
-    }
+    )
 
-    constructor(p: Parcel) {
-        this.default = p.readParcelable(ThumbnailsSettings::class.java.classLoader)!!
-        this.medium = p.readParcelable(ThumbnailsSettings::class.java.classLoader)!!
-        this.high = p.readParcelable(ThumbnailsSettings::class.java.classLoader)!!
-        this.standard = p.readParcelable(ThumbnailsSettings::class.java.classLoader)!!
-    }
+    constructor(p: Parcel) : this (
+        p.readParcelable(ThumbnailsSettings::class.java.classLoader),
+        p.readParcelable(ThumbnailsSettings::class.java.classLoader),
+        p.readParcelable(ThumbnailsSettings::class.java.classLoader),
+        p.readParcelable(ThumbnailsSettings::class.java.classLoader)
+    )
 
     override fun describeContents(): Int {
         return 0

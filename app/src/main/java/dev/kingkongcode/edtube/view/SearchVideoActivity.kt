@@ -1,4 +1,4 @@
-package dev.kingkongcode.edtube.controller
+package dev.kingkongcode.edtube.view
 
 import android.content.Context
 import android.content.Intent
@@ -22,9 +22,9 @@ import dev.kingkongcode.edtube.databinding.ActivitySearchVideoBinding
 import dev.kingkongcode.edtube.model.ETUser
 import dev.kingkongcode.edtube.dialogs.MyCustomDialog
 import dev.kingkongcode.edtube.model.PlaylistItem
-import dev.kingkongcode.edtube.server.APIManager
-import dev.kingkongcode.edtube.util.BaseActivity
-import dev.kingkongcode.edtube.util.ConvertDurationIsoToString
+import dev.kingkongcode.edtube.app.server.APIManager
+import dev.kingkongcode.edtube.app.BaseActivity
+import dev.kingkongcode.edtube.app.ConvertDurationIsoToString
 
 
 class SearchVideoActivity : BaseActivity() {
@@ -114,7 +114,7 @@ class SearchVideoActivity : BaseActivity() {
                             }
                         }
 
-                        APIManager.instance.requestGetVideoDuration(this@SearchVideoActivity, strVideoIdList, completion = {error, durationVideoList ->
+                        APIManager.instance.requestGetVideoDuration(this@SearchVideoActivity, strVideoIdList, completion = { error, durationVideoList ->
                             error?.let { errorMsg -> Toast.makeText(this@SearchVideoActivity, errorMsg, Toast.LENGTH_LONG).show() }
 
                             durationVideoList?.let {
@@ -212,8 +212,8 @@ class SearchVideoActivity : BaseActivity() {
 
             fun bind(video: PlaylistItem, position: Int) {
                 //Code section to send image thumbnails to main view when user click on specific row
-                if (video.snippet.thumbnails.high.url.isNotEmpty()){
-                    Glide.with(itemView.context).load(video.snippet.thumbnails.high.url).into(ivThumbnail)
+                if (video.snippet.thumbnails?.high?.url!!.isNotEmpty()){
+                    Glide.with(itemView.context).load(video.snippet.thumbnails?.high?.url).into(ivThumbnail)
                 }
 
                 video.let {

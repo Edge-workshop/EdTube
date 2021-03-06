@@ -1,4 +1,4 @@
-package dev.kingkongcode.edtube.util
+package dev.kingkongcode.edtube.app
 
 import kotlin.math.ceil
 

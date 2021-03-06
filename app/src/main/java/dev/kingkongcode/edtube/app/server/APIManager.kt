@@ -1,4 +1,4 @@
-package dev.kingkongcode.edtube.server
+package dev.kingkongcode.edtube.app.server
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -10,7 +10,7 @@ import com.android.volley.toolbox.Volley
 import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.model.PlaylistCategory
 import dev.kingkongcode.edtube.model.PlaylistItem
-import dev.kingkongcode.edtube.util.Constants
+import dev.kingkongcode.edtube.app.Constants
 import org.json.JSONObject
 import java.util.*
 import kotlin.collections.ArrayList
@@ -60,7 +60,8 @@ class APIManager {
                 if (response != null) {
                     this.accessToken = response.optString("access_token")
 
-                    val sharedPreferences: SharedPreferences = ctx.getSharedPreferences(SHARED_PROFILE, Context.MODE_PRIVATE)
+                    val sharedPreferences: SharedPreferences = ctx.getSharedPreferences(
+                        SHARED_PROFILE, Context.MODE_PRIVATE)
                     val editor: SharedPreferences.Editor = sharedPreferences.edit()
                     editor.apply {
                         putString("refresh_token",response.optString("refresh_token"))

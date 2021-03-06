@@ -1,4 +1,4 @@
-package dev.kingkongcode.edtube.controller
+package dev.kingkongcode.edtube.view
 
 import android.content.Intent
 import android.os.Build
@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -18,13 +19,14 @@ import com.google.android.gms.common.api.Scope
 import com.google.android.gms.tasks.Task
 import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.databinding.ActivityLoginBinding
-import dev.kingkongcode.edtube.server.APIManager
-import dev.kingkongcode.edtube.server.Config
-import dev.kingkongcode.edtube.util.BaseActivity
+import dev.kingkongcode.edtube.app.server.APIManager
+import dev.kingkongcode.edtube.app.server.Config
+import dev.kingkongcode.edtube.app.BaseActivity
+import dev.kingkongcode.edtube.viewmodel.LoginViewModel
 
 class LoginActivity : BaseActivity() {
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var mGoogleSignInClient : GoogleSignInClient
+    private lateinit var viewModel: LoginViewModel
 
     private companion object {
         private const val TAG = "LoginActivity"
@@ -38,7 +40,10 @@ class LoginActivity : BaseActivity() {
         setContentView(binding.root)
         Log.i(TAG, "onCreate is called")
 
-        initGoogleSignIn()
+        viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
+
+        viewModel.initGoogleSignIn(this)
+
         //obligatory check to make sure we're on 21+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val fade = Fade()
@@ -58,50 +63,32 @@ class LoginActivity : BaseActivity() {
         //updateUI(account) fun to start an intent to next view
     }
 
-    private fun initGoogleSignIn() {
-        //Google SignIn button
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestScopes(Scope(Config.YOUTUBE_AUTH_READONLY))
-            .requestScopes(Scope(Config.YOUTUBE_AUTH_UPLOAD))
-            .requestIdToken(Config.CLIENT_ID)
-            .requestServerAuthCode(Config.CLIENT_ID)
-            .requestEmail()
-            .build()
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
-        // ...
-        // Build a GoogleApiClient with access to the Google Sign-In API and the
-        // options specified by gso.
-    }
 
-    private fun getIdToken() {
-        // Show an account picker to let the user choose a Google account from the device.
-        // If the GoogleSignInOptions only asks for IDToken and/or profile and/or email then no
-        // consent screen will be shown here.
-        val signInIntent = mGoogleSignInClient.signInIntent
-        startActivityForResult(signInIntent, RC_GET_TOKEN)
-    }
 
-    private fun refreshIdToken() {
-        // Attempt to silently refresh the GoogleSignInAccount. If the GoogleSignInAccount
-        // already has a valid token this method may complete immediately.
-        //
-        // If the user has not previously signed in on this device or the sign-in has expired,
-        // this asynchronous branch will attempt to sign in the user silently and get a valid
-        // ID token. Cross-device single sign on will occur in this branch.
-        mGoogleSignInClient.silentSignIn()
-            .addOnCompleteListener(
-                this
-            ) { task -> handleSignInResult(task) }
-    }
+//    private fun getIdToken() {
+//        // Show an account picker to let the user choose a Google account from the device.
+//        // If the GoogleSignInOptions only asks for IDToken and/or profile and/or email then no
+//        // consent screen will be shown here.
+//        val signInIntent = mGoogleSignInClient.signInIntent
+//        startActivityForResult(signInIntent, RC_GET_TOKEN)
+//    }
+//
+//    private fun refreshIdToken() {
+//        // Attempt to silently refresh the GoogleSignInAccount. If the GoogleSignInAccount
+//        // already has a valid token this method may complete immediately.
+//        //
+//        // If the user has not previously signed in on this device or the sign-in has expired,
+//        // this asynchronous branch will attempt to sign in the user silently and get a valid
+//        // ID token. Cross-device single sign on will occur in this branch.
+//        mGoogleSignInClient.silentSignIn()
+//            .addOnCompleteListener(
+//                this
+//            ) { task -> handleSignInResult(task) }
+//    }
 
     private fun settingAllButtons() {
         binding.btnRegSignIn.setOnClickListener {
-            //val intent = Intent(this@LoginActivity, HomePage::class.java)
-            //startActivity(intent)
-            Toast.makeText(this, "NOT implemented yet", Toast.LENGTH_SHORT).show()
-            Log.i(TAG, "Sign out")
-            //TODO don't forget to remove sign out fun
-            signOut()
+            viewModel.signOut(this@LoginActivity)
         }
 
         binding.googleSignInBtn.setOnClickListener {
@@ -114,17 +101,8 @@ class LoginActivity : BaseActivity() {
     private fun signIn() {
         Log.i(TAG, "Function signIn is called")
         widgetElementIsActive(false)
-        val signInIntent = mGoogleSignInClient.signInIntent
+        val signInIntent = viewModel.mGoogleSignInClient.signInIntent
         startActivityForResult(signInIntent, RC_SIGN_IN)
-    }
-
-    //TODO don't forget to remove func no sign out in this page only for test
-    private fun signOut() {
-        mGoogleSignInClient.signOut()
-            .addOnCompleteListener(this) {
-                Toast.makeText(this, getString(R.string.signOut_success), Toast.LENGTH_LONG).show()
-                //finish()
-            }
     }
 
     private fun showImageTransition() {

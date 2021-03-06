@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/primaryBgBlack"
-    tools:context=".controller.HomePageActivity">
+    tools:context=".view.HomePageActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarMenu"

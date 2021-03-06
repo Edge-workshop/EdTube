@@ -1,4 +1,4 @@
-package dev.kingkongcode.edtube.controller
+package dev.kingkongcode.edtube.view
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,7 +7,7 @@ import android.util.Log
 import android.view.animation.AnimationUtils
 import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.databinding.ActivityMainBinding
-import dev.kingkongcode.edtube.util.BaseActivity
+import dev.kingkongcode.edtube.app.BaseActivity
 
 /***
  * SplashScreen Activity

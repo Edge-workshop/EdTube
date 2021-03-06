@@ -2,11 +2,11 @@ package dev.kingkongcode.edtube.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import dev.kingkongcode.edtube.util.Constants
+import dev.kingkongcode.edtube.app.Constants
 import org.json.JSONObject
 
-class ThumbnailsSettings(json: JSONObject) : Parcelable {
-    var url: String = json.optString("url",Constants.EMPTY_STRING)
+data class ThumbnailsSettings(val json: JSONObject) : Parcelable {
+    var url: String = json.optString("url", Constants.EMPTY_STRING)
     var width: Int = json.optInt("width")
     var height: Int = json.optInt("height")
 

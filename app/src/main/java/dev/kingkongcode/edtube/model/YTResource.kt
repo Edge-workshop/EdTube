@@ -2,22 +2,21 @@ package dev.kingkongcode.edtube.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import dev.kingkongcode.edtube.util.Constants
+import dev.kingkongcode.edtube.app.Constants
 import org.json.JSONObject
 
-class YTResource : Parcelable {
-    var kind: String
-    var videoId: String
+data class YTResource(val kind: String, val videoId: String) : Parcelable {
 
-    constructor(json: JSONObject) {
-        this.kind = json.optString("kind",Constants.EMPTY_STRING)
-        this.videoId = json.optString("videoId")
-    }
 
-    constructor(p: Parcel) {
-        this.kind = p.readString()!!
-        this.videoId = p.readString()!!
-    }
+    constructor(jsonObject: JSONObject) : this (
+        jsonObject.optString("kind", Constants.EMPTY_STRING),
+        jsonObject.optString("videoId")
+    )
+
+    constructor(p: Parcel) : this (
+        p.readString()!!,
+        p.readString()!!
+    )
 
     override fun describeContents(): Int {
         return 0

@@ -4,41 +4,39 @@ import android.os.Parcel
 import android.os.Parcelable
 import org.json.JSONObject
 
-class Snippet : Parcelable {
-    private var publishedAt: String
-    private var channelId: String
-    var title: String
-    var description: String
-    lateinit var thumbnails: Thumbnails
-    private var channelTitle: String
-    lateinit var resourceId: YTResource
+data class Snippet(
+    private var publishedAt: String,
+    private var channelId: String,
+    var title: String,
+    var description: String,
+    var thumbnails: Thumbnails?,
+    private var channelTitle: String,
+    var resourceId: YTResource?,
+) : Parcelable {
 
-    constructor(jsonObject: JSONObject) {
-        this.publishedAt = jsonObject.optString("publishedAt")
-        this.channelId = jsonObject.optString("channelId")
-        this.title = jsonObject.optString("title")
-        this.description = jsonObject.optString("description")
-
+    constructor(jsonObject: JSONObject) : this(
+        jsonObject.optString("publishedAt"),
+        jsonObject.optString("channelId"),
+        jsonObject.optString("title"),
+        jsonObject.optString("description"),
         jsonObject.optJSONObject("thumbnails")?.let {
-            this.thumbnails = Thumbnails(it)
-        }
-
-        this.channelTitle = jsonObject.optString("channelTitle")
-
+            Thumbnails(it)
+        },
+        jsonObject.optString("channelTitle"),
         jsonObject.optJSONObject("resourceId")?.let {
-            this.resourceId = YTResource(it)
+            YTResource(it)
         }
-    }
+    )
 
-    constructor(p: Parcel) {
-        this.publishedAt = p.readString()!!
-        this.channelId = p.readString()!!
-        this.title = p.readString()!!
-        this.description = p.readString()!!
-        this.thumbnails = p.readParcelable(Thumbnails::class.java.classLoader)!!
-        this.channelTitle = p.readString()!!
-        this.resourceId = p.readParcelable(YTResource::class.java.classLoader)!!
-    }
+    constructor(p: Parcel) : this(
+        p.readString()!!,
+        p.readString()!!,
+        p.readString()!!,
+        p.readString()!!,
+        p.readParcelable(Thumbnails::class.java.classLoader),
+        p.readString()!!,
+        p.readParcelable(YTResource::class.java.classLoader)
+    )
 
     override fun describeContents(): Int {
         return 0

@@ -1,12 +1,12 @@
-package dev.kingkongcode.edtube.util
+package dev.kingkongcode.edtube.app
 
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import dev.kingkongcode.edtube.util.network.ConnectionStateMonitor
-import dev.kingkongcode.edtube.util.network.NetworkStateConnection
+import dev.kingkongcode.edtube.app.networkconnection.ConnectionStateMonitor
+import dev.kingkongcode.edtube.app.networkconnection.NetworkStateConnection
 
 open class BaseActivity : AppCompatActivity() {
     private lateinit var nc: NetworkStateConnection //Only used if api < 29

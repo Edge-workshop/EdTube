@@ -1,4 +1,4 @@
-package dev.kingkongcode.edtube.util
+package dev.kingkongcode.edtube.app
 
 import android.app.Activity
 import android.view.View

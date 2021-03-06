@@ -2,44 +2,43 @@ package dev.kingkongcode.edtube.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import dev.kingkongcode.edtube.util.Constants
+import dev.kingkongcode.edtube.app.Constants
 import org.json.JSONObject
 
-class PlaylistItem : Parcelable {
-    private var kind: String
-    private var eTag: String
-    var listId: String
+data class PlaylistItem(
+    private var kind: String,
+    private var eTag: String,
+    var listId: String,
+    var isVideoSelected: Boolean = false,
+    var duration: String = Constants.EMPTY_STRING
+) : Parcelable {
+//    private var kind: String
+//    private var eTag: String
+//    var listId: String
     lateinit var id: YTResource
     lateinit var snippet: Snippet
     lateinit var detailsXItem: DetailsXItem
-    var isVideoSelected: Boolean = false
-    var duration: String = Constants.EMPTY_STRING
+//    var isVideoSelected: Boolean = false
+//    var duration: String = Constants.EMPTY_STRING
 
-    constructor(jsonObject: JSONObject) {
-        this.kind = jsonObject.optString("kind")
-        this.eTag = jsonObject.optString("etag")
-        this.listId = jsonObject.optString("id")
-
-        jsonObject.optJSONObject("id")?.let {
-            this.id = YTResource(it)
-        }
-
-        jsonObject.optJSONObject("snippet")?.let {
-           this.snippet = Snippet(it)
-        }
-
-        jsonObject.optJSONObject("contentDetails")?.let {
-            this.detailsXItem = DetailsXItem(it)
-        }
+    constructor(jsonObject: JSONObject) : this (
+        jsonObject.optString("kind"),
+        jsonObject.optString("etag"),
+        jsonObject.optString("id")
+    ) {
+        jsonObject.optJSONObject("id")?.run { id = YTResource(this) }
+        jsonObject.optJSONObject("snippet")?.run { snippet = Snippet(this) }
+        jsonObject.optJSONObject("contentDetails")?.run { detailsXItem = DetailsXItem(this) }
     }
 
-    constructor(p: Parcel) {
-        this.kind = p.readString()?: Constants.EMPTY_STRING
-        this.eTag = p.readString()?: Constants.EMPTY_STRING
-        this.listId = p.readString()?: Constants.EMPTY_STRING
-        this.id = p.readParcelable(YTResource::class.java.classLoader)!!
-        this.snippet = p.readParcelable(Snippet::class.java.classLoader)!!
-        this.detailsXItem = p.readParcelable(DetailsXItem::class.java.classLoader)!!
+    constructor(p: Parcel) : this (
+        p.readString()?: Constants.EMPTY_STRING,
+        p.readString()?: Constants.EMPTY_STRING,
+        p.readString()?: Constants.EMPTY_STRING,
+        ) {
+        id = p.readParcelable(YTResource::class.java.classLoader)!!
+        snippet = p.readParcelable(Snippet::class.java.classLoader)!!
+        detailsXItem = p.readParcelable(DetailsXItem::class.java.classLoader)!!
     }
 
     override fun describeContents(): Int {

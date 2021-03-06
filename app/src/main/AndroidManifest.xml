@@ -14,25 +14,25 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".controller.SearchVideoActivity"
+            android:name=".view.SearchVideoActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".controller.VideoViewActivity"
+        <activity android:name=".view.VideoViewActivity"
             android:configChanges="orientation|screenSize"
             />
-        <activity android:name=".controller.SelectedPListDetailsActivity"
+        <activity android:name=".view.SelectedPListDetailsActivity"
             android:screenOrientation="portrait"
             />
         <activity
-            android:name=".controller.HomePageActivity"
+            android:name=".view.HomePageActivity"
             android:theme="@style/AppThemeWithNoTopBar"
             android:screenOrientation="portrait"
             />
         <activity
-            android:name=".controller.LoginActivity"
+            android:name=".view.LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeWithNoTopBar" />
         <activity
-            android:name=".controller.MainActivity"
+            android:name=".view.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeWithNoTopBar">
             <intent-filter>
