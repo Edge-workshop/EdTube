@@ -16,39 +16,36 @@ import dev.kingkongcode.edtube.app.BaseActivity
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
 
-    private companion object {
-        private const val TAG = "MainActivity"
-        private const val INITIAL_COUNTDOWN_TIME: Long = 850
-        private const val COUNTDOWN_INTERVAL: Long = 1000
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        Log.i(TAG, "onCreate is called")
+        Log.i(TAG, "onCreate()")
     }
 
     override fun onResume() {
         super.onResume()
+        Log.i(TAG, "onResume()")
         titleAnimation()
         setAutomaticTransition()
     }
 
     private fun titleAnimation() {
+        Log.i(TAG, "titleAnimation()")
         /** scale animation on title **/
         val scale = AnimationUtils.loadAnimation(this, R.anim.scale_up)
         binding.tvTitle.startAnimation(scale)
     }
 
     private fun setAutomaticTransition() {
+        Log.i(TAG, "setAutomaticTransition()")
         //Code section to start timer to go automatically in Login page
         val countDownTimer = object : CountDownTimer(INITIAL_COUNTDOWN_TIME, COUNTDOWN_INTERVAL) {
             override fun onTick(p0: Long) {
             }
 
             override fun onFinish() {
-                Log.i(TAG, "CountDownTimer onFinish is called, going to LoginActivity")
+                Log.i(TAG, "CountDownTimer onFinish(), going to LoginActivity")
                 val intent = Intent(this@MainActivity, LoginActivity::class.java)
                 startActivity(intent)
                 overridePendingTransition(R.anim.smooth_act_transition, R.anim.smooth_act_transition)
@@ -57,5 +54,11 @@ class MainActivity : BaseActivity() {
         }
 
         countDownTimer.start()
+    }
+
+    private companion object {
+        private const val TAG = "MainActivity"
+        private const val INITIAL_COUNTDOWN_TIME: Long = 850
+        private const val COUNTDOWN_INTERVAL: Long = 1000
     }
 }

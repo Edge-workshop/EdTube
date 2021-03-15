@@ -13,8 +13,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.model.ETUser
 
+// TODO Create ViewModel class
 class MyCustomDialog(private val user: ETUser) : DialogFragment() {
-
     private inner class ViewHolder {
         lateinit var ivProfilePic: ImageView
         lateinit var tvFirstName: TextView
@@ -26,8 +26,8 @@ class MyCustomDialog(private val user: ETUser) : DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+        savedInstanceState: Bundle?,
+    ) : View? {
         //getDialog()!!.getWindow()?.setBackgroundDrawableResource(R.drawable.round_corner)
         val viewHolder = ViewHolder()
         val convertView = inflater.inflate(R.layout.profil_dialog, container, false)

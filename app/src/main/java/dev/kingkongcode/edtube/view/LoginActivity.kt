@@ -1,5 +1,6 @@
 package dev.kingkongcode.edtube.view
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -9,40 +10,26 @@ import android.view.View
 import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.Scope
-import com.google.android.gms.tasks.Task
 import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.databinding.ActivityLoginBinding
-import dev.kingkongcode.edtube.app.server.APIManager
-import dev.kingkongcode.edtube.app.server.Config
 import dev.kingkongcode.edtube.app.BaseActivity
 import dev.kingkongcode.edtube.viewmodel.LoginViewModel
+import dev.kingkongcode.edtube.viewmodel.LoginViewModelFactory
 
 class LoginActivity : BaseActivity() {
-    private lateinit var binding: ActivityLoginBinding
+    private lateinit var viewBinding: ActivityLoginBinding
     private lateinit var viewModel: LoginViewModel
-
-    private companion object {
-        private const val TAG = "LoginActivity"
-        private const val RC_SIGN_IN = 0
-        private const val RC_GET_TOKEN = 90
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        Log.i(TAG, "onCreate is called")
+        Log.i(TAG, "onCreate()")
+        viewBinding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(viewBinding.root)
 
-        viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
-
-        viewModel.initGoogleSignIn(this)
+        viewModel = ViewModelProviders.of(this, LoginViewModelFactory(application)).get(LoginViewModel::class.java)
+        viewModel.initGoogleSignIn()
 
         //obligatory check to make sure we're on 21+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -51,16 +38,41 @@ class LoginActivity : BaseActivity() {
             window.exitTransition = fade
         }
 
-        settingAllButtons()
+        configAllButtons()
     }
 
     override fun onStart() {
         super.onStart()
+        Log.i(TAG, "onStart()")
         showElementOnScreen()
         //Log.i(TAG, "onStart is called to check if user is already sign in with google auth")
         //this section of code is to check if user is already sign in
         //val account = GoogleSignIn.getLastSignedInAccount(this)
         //updateUI(account) fun to start an intent to next view
+        viewModel.success.observe(this, { success ->
+            if (success) {
+                showImageTransition()
+                widgetElementIsActive(true)
+            }
+        })
+
+        viewModel.loading.observe(this, { isLoading ->
+            if (isLoading) {
+                viewBinding.progressBar.visibility = View.VISIBLE
+            } else viewBinding.progressBar.visibility = View.INVISIBLE
+        })
+
+        viewModel.errorMsg.observe(this, Observer { errorMsg ->
+            errorMsg?.let { strError ->
+                Toast.makeText(this@LoginActivity, strError, Toast.LENGTH_LONG).show()
+                viewModel.clearErrorMsg()
+            }
+        })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.i(TAG, "onResume()")
     }
 
 
@@ -86,28 +98,52 @@ class LoginActivity : BaseActivity() {
 //            ) { task -> handleSignInResult(task) }
 //    }
 
-    private fun settingAllButtons() {
-        binding.btnRegSignIn.setOnClickListener {
-            viewModel.signOut(this@LoginActivity)
+    private fun configAllButtons() {
+        Log.i(TAG, "configAllButtons()")
+        viewBinding.btnRegSignIn.setOnClickListener {
+            signOut(this@LoginActivity)
         }
 
-        binding.googleSignInBtn.setOnClickListener {
+        viewBinding.googleSignInBtn.setOnClickListener {
             Log.i(TAG, "Google sign in button was click by user")
-            binding.progressBar.visibility = View.VISIBLE
+            viewBinding.progressBar.visibility = View.VISIBLE
             signIn()
         }
     }
 
     private fun signIn() {
-        Log.i(TAG, "Function signIn is called")
+        Log.i(TAG, "signIn()")
         widgetElementIsActive(false)
         val signInIntent = viewModel.mGoogleSignInClient.signInIntent
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
 
+    private fun signOut(activity: Activity) {
+        Log.i(TAG, "signOut()")
+        viewModel.mGoogleSignInClient.signOut()
+            .addOnCompleteListener(activity) {
+                Toast.makeText(activity.baseContext, activity.getString(R.string.signOut_success) , Toast.LENGTH_LONG).show()
+                //finish()
+            }
+    }
+
+    //TODO  to put a dialog box protection when user is trying to log in without internet connection
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        Log.i(TAG, "onActivityResult requestCode= $requestCode and resultCode= $resultCode")
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+//            handleSignInResult(viewModel.getGoogleSignInData(data))
+            viewModel.googleSignInData(data)
+        }
+    }
+
     private fun showImageTransition() {
+        Log.i(TAG, "showImageTransition()")
         //setup element for view transition
-        val text = binding.tvTitle
+        val text = viewBinding.tvTitle
         val imagePair = androidx.core.util.Pair.create(text as View, "appTitle")
 
         //Check if we're running on Android 5.0 or higher (API 21)
@@ -127,79 +163,38 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun showElementOnScreen() {
-        binding.etUsername.visibility = View.VISIBLE
-        binding.etPassword.visibility = View.VISIBLE
-        binding.tvOR.visibility = View.VISIBLE
-        binding.btnRegSignIn.visibility = View.VISIBLE
-        binding.googleSignInBtn.visibility = View.VISIBLE
+        Log.i(TAG, "showElementOnScreen()")
+        viewBinding.etUsername.visibility = View.VISIBLE
+        viewBinding.etPassword.visibility = View.VISIBLE
+        viewBinding.tvOR.visibility = View.VISIBLE
+        viewBinding.btnRegSignIn.visibility = View.VISIBLE
+        viewBinding.googleSignInBtn.visibility = View.VISIBLE
     }
 
     private fun hideElementOnScreen() {
-        binding.etUsername.visibility = View.INVISIBLE
-        binding.etPassword.visibility = View.INVISIBLE
-        binding.tvOR.visibility = View.INVISIBLE
-        binding.btnRegSignIn.visibility = View.INVISIBLE
-        binding.googleSignInBtn.visibility = View.INVISIBLE
+        Log.i(TAG, "hideElementOnScreen()")
+        viewBinding.etUsername.visibility = View.INVISIBLE
+        viewBinding.etPassword.visibility = View.INVISIBLE
+        viewBinding.tvOR.visibility = View.INVISIBLE
+        viewBinding.btnRegSignIn.visibility = View.INVISIBLE
+        viewBinding.googleSignInBtn.visibility = View.INVISIBLE
     }
 
     private fun widgetElementIsActive(isActive: Boolean) {
+        Log.i(TAG, "widgetElementIsActive($isActive)")
         if (isActive) {
-            binding.googleSignInBtn.isClickable = true
-            binding.btnRegSignIn.isClickable = true
+            viewBinding.googleSignInBtn.isClickable = true
+            viewBinding.btnRegSignIn.isClickable = true
         } else {
-            binding.googleSignInBtn.isClickable = false
-            binding.btnRegSignIn.isClickable = false
+            viewBinding.googleSignInBtn.isClickable = false
+            viewBinding.btnRegSignIn.isClickable = false
         }
     }
 
-    //TODO  to put a dialog box protection when user is trying to log in without internet connection
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        Log.i(TAG, "onActivityResult requestCode= $requestCode and resultCode= $resultCode")
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            // The Task returned from this call is always completed, no need to attach
-            // a listener.
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            handleSignInResult(task)
-        }
-    }
-
-    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
-        try {
-            val account = completedTask.getResult(ApiException::class.java)
-            val idToken = account?.idToken
-            val deviceCode = account?.serverAuthCode
-            // Signed in successfully, show authenticated UI.
-            APIManager.instance.requestAccessToken(
-                this,
-                idToken,
-                deviceCode,
-                completion = { error ->
-                    error?.let {
-                        binding.progressBar.visibility = View.INVISIBLE
-                        Toast.makeText(this@LoginActivity, error, Toast.LENGTH_SHORT).show()
-                    }
-
-                    /**
-                     * Start next activity when api call to google services is complete and success
-                     * **/
-                    Log.i(
-                        TAG,
-                        "Google access request is completed and successful going to HomePage activity"
-                    )
-
-                    binding.progressBar.visibility = View.INVISIBLE
-                    showImageTransition()
-                    widgetElementIsActive(true)
-                })
-        } catch (e: ApiException) {
-            // The ApiException status code indicates the detailed failure reason.
-            // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w(TAG, "signInResult:failed code=" + e.statusCode)
-        }
-
-        binding.progressBar.visibility = View.INVISIBLE
+    private companion object {
+        private const val TAG = "LoginActivity"
+        private const val RC_SIGN_IN = 0
+        private const val RC_GET_TOKEN = 90
     }
 }
 

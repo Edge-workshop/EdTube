@@ -6,21 +6,17 @@ import dev.kingkongcode.edtube.app.Constants
 import org.json.JSONObject
 
 data class YTResource(val kind: String, val videoId: String) : Parcelable {
-
-
-    constructor(jsonObject: JSONObject) : this (
+    constructor(jsonObject: JSONObject): this(
         jsonObject.optString("kind", Constants.EMPTY_STRING),
-        jsonObject.optString("videoId")
+        jsonObject.optString("videoId"),
     )
 
-    constructor(p: Parcel) : this (
+    constructor(p: Parcel): this(
         p.readString()!!,
-        p.readString()!!
+        p.readString()!!,
     )
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    override fun describeContents(): Int = 0
 
     override fun writeToParcel(dest: Parcel?, p1: Int) {
         dest?.writeString(kind)

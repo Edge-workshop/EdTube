@@ -16,22 +16,13 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class APIManager {
+    // TODO  change all SharedPreference into something else similar
+    // TODO change volley to retrofit
     private var accessToken = Constants.EMPTY_STRING
-    private var userSelectedListRecv = arrayListOf<PlaylistItem>()
-
-    companion object{
-        var instance: APIManager = APIManager()
-        private const val SHARED_PROFILE = "keystoragesaved"
-    }
-
-//    private fun getBaseURL(): String {
-//        return Config.current.OAUTH2_URL
-//    }
+    private var userSelectedList = arrayListOf<PlaylistItem>()
 
     private fun getRegularHeaders(): Map<String, String> {
         val headers = HashMap<String, String>()
-//        headers["language"] = Locale.getDefault().displayLanguage
-//        headers["version"] = BuildConfig.VERSION_NAME
         headers["Authorization"] = "Bearer $accessToken"
         headers["Accept"] = "application/json"
 
@@ -143,15 +134,15 @@ class APIManager {
                 if (response != null) {
                     val responseRecv =  PlaylistCategory(response)
                     for (video in responseRecv.items) {
-                        userSelectedListRecv.add(video)
+                        this.userSelectedList.add(video)
                     }
 
                     //Code section to check if there is another page in the result to fetch before sending back to Activity
                     if (responseRecv.nextPageToken.isNotEmpty()) {
                         requestSelectedPlaylistDetails(context, pListID, responseRecv.nextPageToken, completion)
                     } else {
-                        completion(null, userSelectedListRecv)
-                        userSelectedListRecv.clear()
+                        completion(null, this.userSelectedList)
+                        this.userSelectedList.clear()
                     }
                 } else {
                     completion(R.string.general_unexpected_error.toString(), null)
@@ -270,5 +261,10 @@ class APIManager {
         }
 
         return complDurationList
+    }
+
+    companion object{
+        var instance: APIManager = APIManager()
+        private const val SHARED_PROFILE = "keystoragesaved"
     }
 }

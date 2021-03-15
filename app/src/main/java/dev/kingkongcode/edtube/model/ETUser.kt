@@ -3,13 +3,14 @@ package dev.kingkongcode.edtube.model
 import android.net.Uri
 import android.os.Parcel
 import android.os.Parcelable
+import dev.kingkongcode.edtube.app.Constants
 
 data class ETUser (val firstName: String?, val lastName: String?, val email: String?, val userPhoto: Uri?) : Parcelable {
-    constructor(parcel: Parcel) : this(
+    constructor(parcel: Parcel): this(
         parcel.readString(),
         parcel.readString(),
         parcel.readString(),
-        parcel.readParcelable(Uri::class.java.classLoader)
+        parcel.readParcelable(Uri::class.java.classLoader),
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -19,9 +20,7 @@ data class ETUser (val firstName: String?, val lastName: String?, val email: Str
         parcel.writeParcelable(userPhoto, flags)
     }
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    override fun describeContents(): Int = 0
 
     companion object CREATOR : Parcelable.Creator<ETUser> {
         override fun createFromParcel(parcel: Parcel): ETUser {

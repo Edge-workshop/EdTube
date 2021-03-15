@@ -14,61 +14,66 @@ import dev.kingkongcode.edtube.R
  * Only for api >= 29
  * */
 
-const val TAG = "ConnectionStateMonitor"
-
 open class ConnectionStateMonitor : ConnectivityManager.NetworkCallback() {
     private var networkRequest: NetworkRequest? = null
     private var dialog: Dialog? = null
     private var mActivity: Activity? = null
 
     fun connectionStateMonitor() {
-        networkRequest = NetworkRequest.Builder()
+        Log.i(TAG, "connectionStateMonitor()")
+        this.networkRequest = NetworkRequest.Builder()
             .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
             .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
             .build()
     }
 
     open fun enable(context: Context) {
-        Log.i(TAG,"is enable")
-        mActivity = context as Activity
+        Log.i(TAG,"is enable()")
+        this.mActivity = context as Activity
 
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        connectivityManager.registerNetworkCallback(networkRequest, this)
+        connectivityManager.registerNetworkCallback(this.networkRequest!!, this)
 
-        dialog = Dialog(context)
-        dialog!!.setContentView(R.layout.no_internet_connection_msg_error)
-        dialog!!.setTitle("Connection Lost")
-        dialog!!.setCancelable(false)
+        this.dialog = Dialog(context)
+        this.dialog!!.apply {
+            setContentView(R.layout.no_internet_connection_msg_error)
+            setTitle("Connection Lost")
+            setCancelable(false)
+        }
     }
 
     open fun disable(context: Context) {
-        Log.i(TAG,"is disable")
+        Log.i(TAG,"is disable()")
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         connectivityManager.unregisterNetworkCallback(this)
     }
 
     override fun onAvailable(network: Network?) {
-        Log.i(TAG,"is onAvailable")
-        if (dialog != null && dialog!!.isShowing) {
-            mActivity!!.runOnUiThread {
-                dialog!!.dismiss()
+        Log.i(TAG,"is onAvailable()")
+        if (this.dialog != null && dialog!!.isShowing) {
+            this.mActivity!!.runOnUiThread {
+                this.dialog!!.dismiss()
             }
         }
     }
 
     override fun onLost(network: Network) {
         super.onLost(network)
-        Log.i(TAG,"is onLost")
-        mActivity!!.runOnUiThread {
-            if (dialog != null) dialog!!.show()
+        Log.i(TAG,"is onLost()")
+        this.mActivity!!.runOnUiThread {
+            if (this.dialog != null) this.dialog!!.show()
         }
     }
 
     override fun onUnavailable() {
         super.onUnavailable()
-        Log.i(TAG,"is onUnavailable")
-        if (dialog != null) dialog!!.show()
+        Log.i(TAG,"is onUnavailable()")
+        if (this.dialog != null) this.dialog!!.show()
+    }
+
+    companion object {
+        private const val TAG = "ConnectionStateMonitor"
     }
 }

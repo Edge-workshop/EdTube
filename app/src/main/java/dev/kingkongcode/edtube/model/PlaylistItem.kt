@@ -10,28 +10,23 @@ data class PlaylistItem(
     private var eTag: String,
     var listId: String,
     var isVideoSelected: Boolean = false,
-    var duration: String = Constants.EMPTY_STRING
+    var duration: String = Constants.EMPTY_STRING,
 ) : Parcelable {
-//    private var kind: String
-//    private var eTag: String
-//    var listId: String
     lateinit var id: YTResource
     lateinit var snippet: Snippet
     lateinit var detailsXItem: DetailsXItem
-//    var isVideoSelected: Boolean = false
-//    var duration: String = Constants.EMPTY_STRING
 
-    constructor(jsonObject: JSONObject) : this (
+    constructor(jsonObject: JSONObject): this(
         jsonObject.optString("kind"),
         jsonObject.optString("etag"),
-        jsonObject.optString("id")
+        jsonObject.optString("id"),
     ) {
         jsonObject.optJSONObject("id")?.run { id = YTResource(this) }
         jsonObject.optJSONObject("snippet")?.run { snippet = Snippet(this) }
         jsonObject.optJSONObject("contentDetails")?.run { detailsXItem = DetailsXItem(this) }
     }
 
-    constructor(p: Parcel) : this (
+    constructor(p: Parcel): this(
         p.readString()?: Constants.EMPTY_STRING,
         p.readString()?: Constants.EMPTY_STRING,
         p.readString()?: Constants.EMPTY_STRING,
@@ -41,9 +36,7 @@ data class PlaylistItem(
         detailsXItem = p.readParcelable(DetailsXItem::class.java.classLoader)!!
     }
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    override fun describeContents(): Int = 0
 
     override fun writeToParcel(dest: Parcel?, p1: Int) {
         dest?.writeString(kind)

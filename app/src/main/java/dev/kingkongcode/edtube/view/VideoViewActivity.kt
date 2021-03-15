@@ -13,20 +13,15 @@ import dev.kingkongcode.edtube.app.server.Config
 import dev.kingkongcode.edtube.app.HideSystemUi
 
 class VideoViewActivity : YouTubeBaseActivity() {
-    private lateinit var binding: ActivityVideoViewBinding
-
+    private lateinit var viewBinding: ActivityVideoViewBinding
     private lateinit var onInitializedListener: YouTubePlayer.OnInitializedListener
     private var youtubeVideoID: String? = null
     private var allVideoIDStr: ArrayList<String>? = null
 
-    private companion object {
-        private const val TAG = "VideoViewActivity"
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityVideoViewBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        this.viewBinding = ActivityVideoViewBinding.inflate(layoutInflater)
+        setContentView(this.viewBinding.root)
         Log.i(TAG,"onCreate is called")
     }
 
@@ -40,7 +35,7 @@ class VideoViewActivity : YouTubeBaseActivity() {
     override fun onResume() {
         super.onResume()
         //Back button
-        binding.btnBack.setOnClickListener { onBackPressed() }
+        this.viewBinding.btnBack.setOnClickListener { onBackPressed() }
         settingYoutubePlayer()
     }
 
@@ -54,9 +49,9 @@ class VideoViewActivity : YouTubeBaseActivity() {
         val extras: Bundle? = intent.extras
         if (extras != null) {
             //Code to retrieve youtubeVideoID
-            youtubeVideoID = extras.getString("youtubeVideoID")
+            this.youtubeVideoID = extras.getString("youtubeVideoID")
             //to retrieve list of string id
-            allVideoIDStr = extras.getStringArrayList("playAll")
+            this.allVideoIDStr = extras.getStringArrayList("playAll")
         }
     }
 
@@ -122,6 +117,10 @@ class VideoViewActivity : YouTubeBaseActivity() {
                 ).show()
             }
         }
-        binding.ytYoutubePlayer.initialize(Config.API_KEY, onInitializedListener)
+        viewBinding.ytYoutubePlayer.initialize(Config.API_KEY, onInitializedListener)
+    }
+
+    private companion object {
+        private const val TAG = "VideoViewActivity"
     }
 }

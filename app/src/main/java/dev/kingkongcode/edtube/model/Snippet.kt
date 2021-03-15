@@ -14,7 +14,7 @@ data class Snippet(
     var resourceId: YTResource?,
 ) : Parcelable {
 
-    constructor(jsonObject: JSONObject) : this(
+    constructor(jsonObject: JSONObject): this(
         jsonObject.optString("publishedAt"),
         jsonObject.optString("channelId"),
         jsonObject.optString("title"),
@@ -25,22 +25,20 @@ data class Snippet(
         jsonObject.optString("channelTitle"),
         jsonObject.optJSONObject("resourceId")?.let {
             YTResource(it)
-        }
+        },
     )
 
-    constructor(p: Parcel) : this(
+    constructor(p: Parcel): this(
         p.readString()!!,
         p.readString()!!,
         p.readString()!!,
         p.readString()!!,
         p.readParcelable(Thumbnails::class.java.classLoader),
         p.readString()!!,
-        p.readParcelable(YTResource::class.java.classLoader)
+        p.readParcelable(YTResource::class.java.classLoader),
     )
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    override fun describeContents(): Int = 0
 
     override fun writeToParcel(dest: Parcel?, p1: Int) {
         dest?.writeString(publishedAt)
@@ -53,7 +51,6 @@ data class Snippet(
     }
 
     companion object CREATOR: Parcelable.Creator<Snippet> {
-
         override fun createFromParcel(source: Parcel): Snippet {
             return Snippet(source)
         }

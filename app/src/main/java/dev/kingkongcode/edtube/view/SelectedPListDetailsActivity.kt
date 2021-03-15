@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -17,165 +18,145 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import dev.kingkongcode.edtube.R
 import dev.kingkongcode.edtube.databinding.ActivitySelectedPListDetailsBinding
-import dev.kingkongcode.edtube.model.ETUser
 import dev.kingkongcode.edtube.dialogs.MyCustomDialog
 import dev.kingkongcode.edtube.model.PlaylistItem
 import dev.kingkongcode.edtube.app.server.APIManager
 import dev.kingkongcode.edtube.app.BaseActivity
 import dev.kingkongcode.edtube.app.ConvertDurationIsoToString
+import dev.kingkongcode.edtube.viewmodel.SelectedPListDetailsViewModel
+import dev.kingkongcode.edtube.viewmodel.SelectedPListViewModelFactory
 import java.util.*
 import kotlin.collections.ArrayList
 
 class SelectedPListDetailsActivity : BaseActivity() {
-    private lateinit var binding: ActivitySelectedPListDetailsBinding
-    private lateinit var etUser: ETUser
-
-    private lateinit var youtubeVideoID: String
-
-    private var mPlayList = arrayListOf<PlaylistItem>()
+    private lateinit var viewBinding: ActivitySelectedPListDetailsBinding
+    private lateinit var viewModel: SelectedPListDetailsViewModel
     private lateinit var playlistAdapter: SelectedPListDetailsActivity.PlaylistAdapter
-
-    /**to keep user in this activity after clicking no in LogOutDialog. But bottom navigation will go
-     * back on home item selected **/
-    private var isExiting = true
-
-    private companion object {
-        private const val TAG = "SelectedPListDetails"
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySelectedPListDetailsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        viewBinding = ActivitySelectedPListDetailsBinding.inflate(layoutInflater)
+        setContentView(viewBinding.root)
         Log.i(TAG,"onCreate is called")
 
-        binding.progressBar.visibility = View.VISIBLE
-        settingPlaylistVideo()
-        retrieveAndDisplayUserData()
-        settingClickListener()
+        viewModel = ViewModelProviders.of(this, SelectedPListViewModelFactory(application)).get(SelectedPListDetailsViewModel::class.java)
+
+        viewBinding.progressBar.visibility = View.VISIBLE
+        retrieveData()
+        displayUserInfo()
+        configAllLiveDataObserver()
+        configPlaylistVideoView()
+        viewModel.requestSelectedPlaylist(viewModel.selectedListId)
+        configAllClickListener()
         settingBottomNavigation()
     }
 
+    // TODO find sollution to put this block of code in ViewModel activity -> replace intent.extra with something else
     @SuppressLint("SetTextI18n")
-    private fun retrieveAndDisplayUserData() {
-        var videoNbr: String
+    private fun retrieveData() {
         val extras: Bundle? = intent.extras
         extras?.let { xtra ->
-            //Getting user info
-            etUser = xtra.getParcelable("ETUser")!!
-            //Code to display the right String in user lang
-            val completeStringTitle = if (Locale.getDefault().isO3Language == "eng") {
-                "${etUser.firstName}' s Playlist."
-            } else "La Playlist à ${etUser.firstName}."
-            binding.tvPlaylistTitle.text = completeStringTitle
-
-            //Code to retrieve profile pic from google sign in or else default pic
-            Glide.with(this).load(etUser.userPhoto).
-            diskCacheStrategy(DiskCacheStrategy.NONE).
-            error(R.drawable.profile_pic_na).into(binding.ivProfilePic)
-
-            binding.ivProfilePic.setOnClickListener {
-                Log.i(TAG,"User click on profile icon custom dialog show")
-                MyCustomDialog(etUser).show(supportFragmentManager,"MyCustomFragment")
-            }
-
-            //Retrieving user selected list id
-            requestSelectedPList(extras.getString("selectedListID")!!)
-            extras.getString("videoNbr")!!.also { videoNbr = it }
-            val firstPartText = getString(R.string.number_of_video)
-            (firstPartText+"\t\t"+videoNbr).also { firstPart -> binding.tvNbrOfVideo.text = firstPart }
+            // Getting user info
+            viewModel.etUser = xtra.getParcelable("ETUser")!!
+            // Getting user selected list id
+            viewModel.selectedListId = extras.getString("selectedListID")!!
+            // Getting number of video in selected list
+            extras.getString("videoNbr")!!.also { viewModel.numberOfVideo = it }
         }
     }
 
-    private fun settingPlaylistVideo() {
+    private fun displayUserInfo() {
+        //Code to display the right String in user lang
+        val completeStringTitle = if (Locale.getDefault().isO3Language == "eng") {
+            "${viewModel.etUser.firstName}' s Playlist."
+        } else "La Playlist à ${viewModel.etUser.firstName}."
+        viewBinding.tvPlaylistTitle.text = completeStringTitle
+
+        //Code to retrieve profile pic from google sign in or else default pic
+        Glide.with(this).load(viewModel.etUser.userPhoto).
+        diskCacheStrategy(DiskCacheStrategy.NONE).
+        error(R.drawable.profile_pic_na).into(viewBinding.ivProfilePic)
+
+        val firstPartText = getString(R.string.number_of_video)
+        (firstPartText+"\t\t"+viewModel.numberOfVideo).also { firstPart -> viewBinding.tvNbrOfVideo.text = firstPart }
+    }
+
+    private fun configPlaylistVideoView() {
+        Log.i(TAG, "settingPlaylistVideo()")
         //Code section initiate RecycleView and PlaylistAdapter
         val linearLayoutManager = LinearLayoutManager(this@SelectedPListDetailsActivity)
-        binding.rvListVideo.layoutManager = linearLayoutManager
-        playlistAdapter = PlaylistAdapter(this.mPlayList)
-        binding.rvListVideo.adapter = playlistAdapter
+        viewBinding.rvListVideo.layoutManager = linearLayoutManager
+        playlistAdapter = PlaylistAdapter(viewModel.mPlayList)
+        viewBinding.rvListVideo.adapter = playlistAdapter
+
     }
 
-    private fun requestSelectedPList(selectedID: String) {
-        Log.i(TAG,"Function requestSelectedPList was called")
-        lateinit var tempPlayList: ArrayList<PlaylistItem>
-
-        APIManager.instance.requestSelectedPlaylistDetails(this@SelectedPListDetailsActivity, selectedID, null, completion = { error, selectedPList ->
-            Log.i(TAG,"APIManager requestSelectedPlaylistDetails response receive in activity")
-
-            error?.let { errorMsg -> Toast.makeText(this@SelectedPListDetailsActivity, errorMsg, Toast.LENGTH_SHORT).show() }
-
-            //Code section where we populate adapter with api response data
-            selectedPList?.let { xSelectedPList ->
-                tempPlayList = xSelectedPList.clone() as ArrayList<PlaylistItem>
-                val strVideoIdList = arrayListOf<String>()
-                for (videoStrId in tempPlayList ) {
-                    strVideoIdList.add(videoStrId.snippet.resourceId?.videoId!!)
-                }
-
-                APIManager.instance.requestGetVideoDuration(this@SelectedPListDetailsActivity, strVideoIdList, completion = { error, durationVideoList ->
-                    error?.let { Toast.makeText(this@SelectedPListDetailsActivity, it, Toast.LENGTH_LONG).show() }
-
-                    durationVideoList?.let {
-                        //Code section where we get list from API server and to match video id from user selected list from first API call
-                        for (durationPairObj in it) {
-                            for (videoStrId in tempPlayList) {
-                                if (durationPairObj.first == videoStrId.snippet.resourceId?.videoId) {
-                                    videoStrId.duration = durationPairObj.second
-                                }
-                            }
-                        }
-
-                        playlistAdapter.update(tempPlayList)
-                        //Code section where we initiate first thumbnails and store youtube video id that is link with thumbnail
-                        if (tempPlayList[0].snippet.thumbnails?.high?.url!!.isNotEmpty()){
-                            Glide.with(this@SelectedPListDetailsActivity).load(tempPlayList[0].snippet.thumbnails?.high?.url).into(binding.ivSelectedThumbnail)
-                        }
-
-                        binding.ivSinglePlay.visibility = View.VISIBLE
-                        youtubeVideoID = tempPlayList[0].snippet.resourceId?.videoId!!
-                    }
-                })
+    private fun displayPlaylistVideo() {
+        if (viewModel.errorMessage.isNullOrEmpty()) {
+            playlistAdapter.update(viewModel.mPlayList)
+            if (viewModel.mPlayList[0].snippet.thumbnails?.high?.url!!.isNotEmpty()){
+                Glide.with(this@SelectedPListDetailsActivity).load(viewModel.mPlayList[0].snippet.thumbnails?.high?.url).into(viewBinding.ivSelectedThumbnail)
             }
-        })
+
+            viewBinding.ivSinglePlay.visibility = View.VISIBLE
+            viewModel.youtubeVideoID = viewModel.mPlayList[0].snippet.resourceId?.videoId!!
+        } else {
+            Toast.makeText(this@SelectedPListDetailsActivity, viewModel.errorMessage, Toast.LENGTH_LONG).show()
+        }
     }
 
-    private fun settingClickListener() {
+    private fun configAllClickListener() {
         //Code section when user click into main thumbnail image
-        binding.ivSelectedThumbnail.setOnClickListener {
+        viewBinding.ivSelectedThumbnail.setOnClickListener {
             val intent = Intent(this@SelectedPListDetailsActivity,VideoViewActivity::class.java)
-            intent.putExtra("youtubeVideoID",youtubeVideoID)
+            intent.putExtra("youtubeVideoID", viewModel.youtubeVideoID)
             startActivity(intent)
         }
 
-        binding.ibPlayAllBtn.setOnClickListener {
+        viewBinding.ibPlayAllBtn.setOnClickListener {
+            Log.i(TAG, "Play all video is pressed by user")
             val allVideoId = arrayListOf<String>()
-            for (videoId in this.mPlayList){
-                allVideoId.add(videoId.snippet.resourceId?.videoId!!)
+            for (video in viewModel.mPlayList){
+                allVideoId.add(video.snippet.resourceId?.videoId!!)
             }
 
             val intent = Intent(this@SelectedPListDetailsActivity,VideoViewActivity::class.java)
             intent.putExtra("playAll",allVideoId)
             startActivity(intent)
         }
+
+        viewBinding.ivProfilePic.setOnClickListener {
+            Log.i(TAG,"User click on profile icon custom dialog show")
+            MyCustomDialog(viewModel.etUser).show(supportFragmentManager,"MyCustomFragment")
+        }
+    }
+
+    private fun configAllLiveDataObserver() {
+        viewModel.loading.observe(this@SelectedPListDetailsActivity, { isLoading ->
+            if (!isLoading) {
+                displayPlaylistVideo()
+                viewBinding.progressBar.visibility = View.INVISIBLE
+            } else viewBinding.progressBar.visibility = View.VISIBLE
+        })
     }
 
     private fun settingBottomNavigation() {
         //Code section for Bottom Navigation menu item
-        binding.bottomNavigation.setOnNavigationItemSelectedListener {
+        viewBinding.bottomNavigation.setOnNavigationItemSelectedListener {
             when(it.itemId) {
                 R.id.home_page_menu_home -> {
-                    if (isExiting) {
+                    if (viewModel.isExiting) {
                         val intent = Intent(this@SelectedPListDetailsActivity,HomePageActivity::class.java)
                         startActivity(intent)
                         finish()
-                    } else isExiting = true
+                    } else viewModel.isExiting = true
 
                     true
                 }
 
                 R.id.home_page_menu_search -> {
                     val intent = Intent(this@SelectedPListDetailsActivity,SearchVideoActivity::class.java)
-                    intent.putExtra("ETUser",etUser)
+                    intent.putExtra("ETUser",viewModel.etUser)
                     startActivity(intent)
                     finish()
                     true
@@ -201,8 +182,8 @@ class SelectedPListDetailsActivity : BaseActivity() {
                 signOut()
             }
             setNegativeButton("NO") { dialog, id ->
-                isExiting = false
-                binding.bottomNavigation.selectedItemId = R.id.home_page_menu_home
+                viewModel.isExiting = false
+                viewBinding.bottomNavigation.selectedItemId = R.id.home_page_menu_home
                 dialog.cancel()
             }
             create()
@@ -241,7 +222,7 @@ class SelectedPListDetailsActivity : BaseActivity() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) : PlaylistAdapter.VideoViewHolder {
             val layout =  R.layout.video_details_row
             val view = LayoutInflater.from(parent.context).inflate(layout, parent, false)
-            binding.progressBar.visibility = View.INVISIBLE
+            viewBinding.progressBar.visibility = View.INVISIBLE
             return VideoViewHolder(view)
         }
 
@@ -257,9 +238,9 @@ class SelectedPListDetailsActivity : BaseActivity() {
         @Override
         override fun onBindViewHolder(holder: VideoViewHolder, position: Int) {
             //Code section to highlight first row on first creation
-            if (isJustStarted) {
+            if (this.isJustStarted) {
                 dataSet[0].isVideoSelected = true
-                isJustStarted = false
+                this.isJustStarted = false
             }
 
             val video = dataSet[position]
@@ -275,16 +256,20 @@ class SelectedPListDetailsActivity : BaseActivity() {
 
                 //Code section to send image thumbnails to main view when user click on specific row
                 if (video.snippet.thumbnails?.high?.url!!.isNotEmpty()) {
-                    Glide.with(holder.itemView.context).load(video.snippet.thumbnails?.high?.url).into(binding.ivSelectedThumbnail)
-                    youtubeVideoID = video.snippet.resourceId?.videoId!!
+                    Glide.with(holder.itemView.context).load(video.snippet.thumbnails?.high?.url).into(viewBinding.ivSelectedThumbnail)
+                    viewModel.youtubeVideoID = video.snippet.resourceId?.videoId!!
                 }
 
                 //Code section to reset proper value in data set in adapter
-                dataSet[oldIndexSelected].isVideoSelected = false
+                dataSet[this.oldIndexSelected].isVideoSelected = false
                 dataSet[position].isVideoSelected = true
-                oldIndexSelected = position
+                this.oldIndexSelected = position
                 notifyDataSetChanged()
             }
         }
+    }
+
+    private companion object {
+        private const val TAG = "SelectedPListDetails"
     }
 }

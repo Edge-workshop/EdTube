@@ -8,11 +8,9 @@ data class Thumbnails(
     var default: ThumbnailsSettings?,
     var medium: ThumbnailsSettings?,
     var high: ThumbnailsSettings?,
-    var standard: ThumbnailsSettings?
+    var standard: ThumbnailsSettings?,
 ) : Parcelable {
-
-
-    constructor(jsonObject: JSONObject) : this (
+    constructor(jsonObject: JSONObject): this(
         jsonObject.optJSONObject("default")?.let {
             ThumbnailsSettings(it)
         },
@@ -24,19 +22,17 @@ data class Thumbnails(
         },
         jsonObject.optJSONObject("standard")?.let {
             ThumbnailsSettings(it)
-        }
+        },
     )
 
-    constructor(p: Parcel) : this (
+    constructor(p: Parcel): this(
         p.readParcelable(ThumbnailsSettings::class.java.classLoader),
         p.readParcelable(ThumbnailsSettings::class.java.classLoader),
         p.readParcelable(ThumbnailsSettings::class.java.classLoader),
-        p.readParcelable(ThumbnailsSettings::class.java.classLoader)
+        p.readParcelable(ThumbnailsSettings::class.java.classLoader),
     )
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    override fun describeContents(): Int = 0
 
     override fun writeToParcel(dest: Parcel?, p1: Int) {
         dest?.writeParcelable(default, 0)

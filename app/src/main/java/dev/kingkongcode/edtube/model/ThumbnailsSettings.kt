@@ -10,9 +10,7 @@ data class ThumbnailsSettings(val json: JSONObject) : Parcelable {
     var width: Int = json.optInt("width")
     var height: Int = json.optInt("height")
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    override fun describeContents(): Int = 0
 
     override fun writeToParcel(dest: Parcel?, p1: Int) {
         dest?.writeString(url)

@@ -4,17 +4,16 @@ import kotlin.math.ceil
 
 class PaginationList {
     companion object{
-
         fun showNbrPage(listItemActivities: ArrayList<dev.kingkongcode.edtube.model.PlaylistItem>, currentPage: Int) : Pair<String,Int> {
             val totalOfItems = listItemActivities.size
             val nbrOfItemsPerPage = 4.0
             val totalOfPage: Int = ceil(totalOfItems /nbrOfItemsPerPage).toInt()
+
             return Pair("$currentPage/$totalOfPage",totalOfPage)
         }
 
         fun filterPage(listItemActivities: ArrayList<dev.kingkongcode.edtube.model.PlaylistItem>, currentPage: Int) : ArrayList<dev.kingkongcode.edtube.model.PlaylistItem> {
             val filterList = ArrayList<dev.kingkongcode.edtube.model.PlaylistItem>()
-            //val maxIndex = listItems.size - 1
             val nbrOfItemsPerPage = 4.0
 
             val lastIndexInPage: Int = if ((currentPage * nbrOfItemsPerPage)-1 <= listItemActivities.size - 1) {
